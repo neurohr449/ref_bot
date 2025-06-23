@@ -26,8 +26,8 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     name = user_data.get('user_name')
     text = f"🏠 Главное меню 🎉 {name}, рады видеть вас снова! Выберите необходимый раздел для работы с вашими рекомендациями."
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[[InlineKeyboardButton(text="Отправить клиента", callback_data = "menu_1")],
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="Отправить клиента", callback_data = "menu_1")],
                   [InlineKeyboardButton(text="Узнать статус клиентов", callback_data = "menu_2")],
                   [InlineKeyboardButton(text="Реферальная ссылка", callback_data = "menu_3")],
                   [InlineKeyboardButton(text="Мои реквезиты", callback_data = "menu_4")],
