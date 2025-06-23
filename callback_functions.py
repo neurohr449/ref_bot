@@ -36,7 +36,7 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
                   [KeyboardButton(text="Добавить партнера", callback_data = "menu_7")],
                   [KeyboardButton(text="Связь с менеджером", callback_data = "menu_8")]
                   ],
-        resize_keyboard=True,
+        
     )
     await callback_query.message.answer(text=text,reply_markup=keyboard)
 
@@ -135,8 +135,8 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_2(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    text = user_data.get('text_1')
-    video = user_data.get('video_1')
+    text = user_data.get('text_2')
+    video = user_data.get('video_2')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Продолжить", callback_data="next")]
             ])
