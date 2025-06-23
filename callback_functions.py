@@ -517,8 +517,3 @@ async def contact_us(callback_query: CallbackQuery, state: FSMContext):
     await callback_query.message.answer(text = text)
 
 
-async def course_10(callback_query: CallbackQuery, state: FSMContext):
-    pass
-
-async def course_10(message: Message, state: FSMContext):
-    pass
