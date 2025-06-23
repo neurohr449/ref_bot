@@ -1,5 +1,6 @@
 import os
 import gspread
+import asyncio
 from google.oauth2.service_account import Credentials
 from aiogram.fsm.context import FSMContext
 
@@ -26,6 +27,34 @@ async def get_google_sheet_data(sheet_id, range_name, worksheet):
     sheet = client.open_by_key(sheet_id).get_worksheet(worksheet) 
     data = sheet.get(range_name)
     return data
+
+async def get_google_sheet(sheet_id: str, list_index: int):
+    scope = ["https://www.googleapis.com/auth/spreadsheets"]
+    
+    # Создаем credentials
+    creds = Credentials.from_service_account_info({
+        "type": os.getenv("GS_TYPE"),
+        "project_id": os.getenv("GS_PROJECT_ID"),
+        "private_key_id": os.getenv("GS_PRIVATE_KEY_ID"),
+        "private_key": os.getenv("GS_PRIVATE_KEY").replace('\\n', '\n'),
+        "client_email": os.getenv("GS_CLIENT_EMAIL"),
+        "client_id": os.getenv("GS_CLIENT_ID"),
+        "auth_uri": os.getenv("GS_AUTH_URI"),
+        "token_uri": os.getenv("GS_TOKEN_URI"),
+        "auth_provider_x509_cert_url": os.getenv("GS_AUTH_PROVIDER_X509_CERT_URL"),
+        "client_x509_cert_url": os.getenv("GS_CLIENT_X509_CERT_URL"),
+        "universe_domain": os.getenv("UNIVERSE_DOMAIN")
+    }, scopes=scope)
+    
+    try:
+        client = await asyncio.to_thread(gspread.authorize, creds)
+        
+        spreadsheet = await asyncio.to_thread(client.open_by_key, sheet_id)
+        worksheet = await asyncio.to_thread(spreadsheet.get_worksheet, list_index)
+        return worksheet
+    except Exception as e:
+        print(f"Ошибка доступа к Google Sheets: {e}")
+        raise
 
 async def get_table_data(sheet_id, worksheet, state: FSMContext):
     
@@ -82,3 +111,127 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
             video_9=row_data[18],
             video_10=row_data[19]
             )
+        
+
+
+
+async def check_user_reg(sheet_id, user_id):
+    sheet = await get_google_sheet(sheet_id, 2)
+    data = await asyncio.to_thread(sheet.get_all_records)
+    user_row = None
+    for i, row in enumerate(data, start=2):  
+        if f"{user_id}".lower() == row.get('id Партнера', '').lower():
+            user_row = i
+            break
+
+    if user_row:
+        return True
+    else:
+        return False
+
+
+async def write_to_google_sheet(
+    sheet_id: str,
+    user_id: str,
+    username: str,
+    first_name: str,
+    last_name: str,
+    bank_info_card_number: str = None,
+    bank_info_bank: str = None,
+    bank_info_sbp: str = None,
+    bank_info_fio: str = None
+) -> bool:
+
+    try:
+        if not username:
+            print("Ошибка: username обязателен")
+            return False
+
+        sheet = await get_google_sheet(sheet_id, 2)
+        data = await asyncio.to_thread(sheet.get_all_records)
+        
+        user_row = None
+        for i, row in enumerate(data, start=2):  # начинаем с 2, так как первая строка - заголовки
+            if f"{user_id}".lower() == row.get('id Партнера', '').lower():
+                user_row = i
+                break
+        
+       
+        update_data = {}
+        
+        if not user_row:
+            update_data = {
+                'id Партнера': user_id,
+                'ТГ Ник': f"@{username}",
+                'Имя': first_name,
+                'Фамилия': last_name,
+                'Инормация для выплат Номер карты': bank_info_card_number or "",
+                'Инормация для выплат Банк': bank_info_bank or "",
+                'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
+                'Инормация для выплат Имя получателя': bank_info_fio or ""
+            }
+        
+        # # Обновляемые поля
+        # if first_name is not None:
+        #     update_data['Имя (ТГ)'] = first_name
+        # if status is not None:
+        #     update_data['Статус'] = status
+        # if gpt_response is not None:
+        #     update_data['AI комент'] = gpt_response
+        # if full_name is not None:
+        #     update_data['ФИО'] = full_name
+        # if phone_number is not None:
+        #     update_data['Номер'] = phone_number
+        # if resume_link is not None:
+        #     update_data['Ссылка на резюме'] = resume_link
+        # if interview_date is not None:
+        #     update_data['Дата собеседования'] = interview_date
+        # if interview_time is not None:
+        #     update_data['Время собесдеования'] = interview_time
+        # if qa_data is not None:
+        #     update_data['Вопросы и ответы'] = qa_data
+        # if user_score is not None:
+        #     update_data['Баллы'] = user_score
+        # if company_name is not None:
+        #     update_data['Название компании'] = company_name
+        # if job_name is not None:
+        #     update_data['Название вакансии'] = job_name
+        
+
+        if user_row:
+            current_values = data[user_row-2]
+
+            for key in update_data:
+                current_values[key] = update_data[key]
+            
+            row_values = [
+                current_values.get('id Партнера', ''),                              # A
+                current_values.get('ТГ Ник', ''),                                   # B
+                current_values.get('Имя', ''),                                      # C
+                current_values.get('Фамилия', ''),                                  # D
+                current_values.get('Инормация для выплат Номер карты', ''),         # E                                       
+                current_values.get('Инормация для выплат Банк', ''),                # G
+                current_values.get('Инормация для выплат Номер телефона СБП', ''),  # H
+                current_values.get('Инормация для выплат Имя получателя', '')       # I   
+            ]
+            
+            await asyncio.to_thread(sheet.update, f'A{user_row}:S{user_row}', [row_values])
+        else:
+            
+            new_row = [
+                user_id,                                     # A Дата
+                f"@{username}",                              # B ТГ Ник
+                first_name or "",                            # C Имя
+                last_name,                                   # D Фамилия
+                bank_info_card_number or "1.Начал чат-бота", # E Инормация для выплат Номер карты
+                bank_info_bank,                              # F Инормация для выплат Банк
+                bank_info_sbp or "",                         # G Инормация для выплат Номер телефона СБП
+                bank_info_fio or "",                         # H Инормация для выплат Имя получателя
+                ]
+            
+            await asyncio.to_thread(sheet.append_row, new_row)
+        
+        return True
+    except Exception as e:
+        print(f"Ошибка записи в Google Sheets: {e}")
+        return False
