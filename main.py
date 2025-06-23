@@ -1,0 +1,246 @@
+import asyncio
+import logging
+import sys
+import os
+import re
+from datetime import datetime, timedelta
+from aiogram import Bot, Dispatcher, html, Router, BaseMiddleware
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram.filters import CommandStart, Command, CommandObject
+from aiogram.filters.state import StateFilter
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+
+from functions import *
+from callback_functions import *
+from all_states import *
+
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+FAIL_KEYBOARD = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Попробовать снова", callback_data="retry")]
+            ])
+
+
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(
+    parse_mode=ParseMode.HTML))
+storage = MemoryStorage()
+router = Router()
+dp = Dispatcher(storage=storage)
+
+
+class StateMiddleware(BaseMiddleware):
+    async def __call__(self, handler, event: Message, data: dict):
+        state = data['state']
+        current_state = await state.get_state()
+        data['current_state'] = current_state
+        return await handler(event, data)
+    
+@router.callback_query(lambda c: c.data == 'menu')
+async def menu_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu(callback_query, state)
+
+
+@router.message(CommandStart())
+async def command_start_handler(message: Message, command: CommandObject, state: FSMContext) -> None:
+    await state.set_state(UserState.welcome)
+    args = command.args
+
+    if args:
+        parts = args.rsplit('_', 2)
+        sheet_id  = parts[0]
+        ref_id = parts[1]    
+        func_id = parts[2]
+    else:
+        await message.answer("👋 Здравствуйте. Запустите бота по уникальной ссылке!")
+
+    await state.update_data(sheet_id=sheet_id,
+                            ref_id=ref_id,
+                            func_id=func_id)
+    text = "👋 Добро пожаловать в нашу партнёрскую программу!\n\nВ этом Телеграм-боте доступен ваш личный кабинет партнёра:    \n\n— ➕ Добавление новых рекомендаций    \n\n— 🔄 Статусы добавленных рекомендаций    \n\n— 💰 Выплаты    \n\n— 🎓 Обучение и условия    \n\n— 📞 Связь с персональным менеджеромЧтобы начать зарабатывать на рекомендациях, осталось только зарегистрироваться!"
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Регистрация", callback_data="next")]
+    ])
+    
+    await message.answer(f"{text}", reply_markup = keyboard)
+
+@router.callback_query(StateFilter(UserState.welcome))
+async def reg_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await reg_1(callback_query, state)
+
+@router.message(StateFilter(UserState.reg_1))
+async def reg_2_handler(message: Message, state: FSMContext) -> None:
+    await reg_2(message, state)
+
+@router.message(StateFilter(UserState.reg_2))
+async def reg_3_handler(message: Message, state: FSMContext) -> None:
+    await reg_3(message, state)
+
+@router.message(StateFilter(UserState.reg_3))
+async def reg_4_handler(message: Message, state: FSMContext) -> None:
+    await reg_4(message, state)
+    
+######################################################################################################################################################################################################################################################
+@router.callback_query(StateFilter(UserState.reg_4))
+async def course_1_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_1(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_1))
+async def course_2_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_2(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_2))
+async def course_3_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_3(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_3))
+async def course_4_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_4(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_4))
+async def course_5_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_5(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_5))
+async def course_6_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_6(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_6))
+async def course_7_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_7(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_7))
+async def course_8_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_8(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_8))
+async def course_9_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_9(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.course_9))
+async def course_10_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await course_10(callback_query, state)
+
+######################################################################################################################################################################################################################################################
+#########
+@router.callback_query(lambda c: c.data == 'menu_1')
+async def send_client_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await send_client_1(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.send_client_1))
+async def send_client_2_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await send_client_2(callback_query, state)
+
+@router.message(StateFilter(UserState.send_client_2))
+async def send_client_3_handler(message: Message, state: FSMContext) -> None:
+    await send_client_3(message, state)
+
+@router.message(StateFilter(UserState.send_client_3))
+async def send_client_4_handler(message: Message, state: FSMContext) -> None:
+    await send_client_4(message, state)
+
+@router.callback_query(StateFilter(UserState.send_client_4))
+async def send_client_5_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    if callback_query.data == "confurm":
+        await send_client_5(callback_query, state)
+    elif callback_query.data == "edit":
+        await send_client_2(callback_query, state)
+
+###########
+@router.callback_query(lambda c: c.data == 'menu_2')
+async def client_status_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await client_status_1(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.client_status_1))
+async def client_status_2_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await client_status_2(callback_query, state)
+
+############
+@router.callback_query(lambda c: c.data == 'menu_3')
+async def ref_link_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await ref_link_1(callback_query, state)
+
+
+############
+@router.callback_query(lambda c: c.data == 'menu_3')
+async def bank_info_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await bank_info_1(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.bank_info_change))
+async def bank_info_change_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    if callback_query.data == "card_number":
+        await bank_info_change_card_number(callback_query, state)
+    elif callback_query.data == "bank":
+        await bank_info_change_bank(callback_query, state)
+    elif callback_query.data == "sbp":
+        await bank_info_change_sbp(callback_query, state)
+    elif callback_query.data == "fio":
+        await bank_info_change_fio(callback_query, state)
+
+@router.message(StateFilter(UserState.bank_info_change_card_number))
+async def bank_info_change_card_number_handler(message: Message, state: FSMContext) -> None:
+    await bank_info_change_card_number_2(message, state)
+
+@router.message(StateFilter(UserState.bank_info_change_bank))
+async def bank_info_change_bank_handler(message: Message, state: FSMContext) -> None:
+    await bank_info_change_bank_2(message, state)
+    
+@router.message(StateFilter(UserState.bank_info_change_sbp))
+async def bank_info_change_sbp_handler(message: Message, state: FSMContext) -> None:
+    await bank_info_change_sbp_2(message, state)
+
+@router.message(StateFilter(UserState.bank_info_change_fio))
+async def bank_info_change_fio_handler(message: Message, state: FSMContext) -> None:
+    await bank_info_change_fio_2(message, state)
+
+
+########
+@router.callback_query(lambda c: c.data == 'menu_5')
+async def chat_link_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await chat_link(callback_query, state)
+
+
+
+#########
+@router.callback_query(lambda c: c.data == 'menu_6')
+async def tos_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await tos(callback_query, state)
+
+#########
+@router.callback_query(lambda c: c.data == 'menu_7')
+async def add_partner_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await add_partner_1(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.add_partner_1))
+async def add_partner_2_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await add_partner_2(callback_query, state)
+
+@router.message(StateFilter(UserState.add_partner_2))
+async def add_partner_3_handler(message: Message, state: FSMContext) -> None:
+    await add_partner_3(message, state)
+
+
+
+
+#########
+@router.callback_query(lambda c: c.data == 'menu_8')
+async def contact_us_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await contact_us(callback_query, state)
+
+
+
+
+
+async def main() -> None:
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    dp.include_router(router)
+    dp.message.middleware(StateMiddleware())
+    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(
+        parse_mode=ParseMode.HTML))
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
