@@ -69,7 +69,7 @@ async def reg_2(message: Message, state: FSMContext):
     phone_number = message.contact.phone_number
     if phone_number:
         await state.update_data(phone=phone_number)
-        await message.answer(f"Мы не нашли личный кабинет по номеру телефона {phone_number}. Давайте зарегистрируем вас.  \n\n✏️ Пожалуйста, введите ваше имя, чтобы продолжить.")
+        await message.answer(text = f"Мы не нашли личный кабинет по номеру телефона {phone_number}. Давайте зарегистрируем вас.  \n\n✏️ Пожалуйста, введите ваше имя, чтобы продолжить.", reply_markup=None)
         await state.set_state(UserState.reg_2)
     else:
         await message.answer("Не удалось получить номер телефона. Попробуйте снова", reply_markup=FAIL_KEYBOARD)
