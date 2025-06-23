@@ -85,7 +85,7 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
 
 
 async def reg_2(message: Message, state: FSMContext):
-    user_data = state.get_data()
+    user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
     phone_number = message.contact.phone_number
