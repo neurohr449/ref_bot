@@ -50,6 +50,7 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     await get_table_data(sheet_id, 0, state)
+    user_data = await state.get_data()
     text = user_data.get('reg_1')
     text_2 = user_data.get('reg_2')
     contact_keyboard = ReplyKeyboardMarkup(

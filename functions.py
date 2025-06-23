@@ -80,5 +80,5 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
             video_7=row_data[16],
             video_8=row_data[17],
             video_9=row_data[18],
-            video_10=row_data[19],
+            video_10=row_data[19]
             )
