@@ -27,14 +27,14 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
     name = user_data.get('user_name')
     text = f"🏠 Главное меню 🎉 {name}, рады видеть вас снова! Выберите необходимый раздел для работы с вашими рекомендациями."
     keyboard = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Отправить клиента", callback_data = "menu_1")],
-                  [KeyboardButton(text="Узнать статус клиентов", callback_data = "menu_2")],
-                  [KeyboardButton(text="Реферальная ссылка", callback_data = "menu_3")],
-                  [KeyboardButton(text="Мои реквезиты", callback_data = "menu_4")],
-                  [KeyboardButton(text="Общий чат партнеров", callback_data = "menu_5")],
-                  [KeyboardButton(text="Условия партнерства", callback_data = "menu_6")],
-                  [KeyboardButton(text="Добавить партнера", callback_data = "menu_7")],
-                  [KeyboardButton(text="Связь с менеджером", callback_data = "menu_8")]
+        keyboard=[[InlineKeyboardButton(text="Отправить клиента", callback_data = "menu_1")],
+                  [InlineKeyboardButton(text="Узнать статус клиентов", callback_data = "menu_2")],
+                  [InlineKeyboardButton(text="Реферальная ссылка", callback_data = "menu_3")],
+                  [InlineKeyboardButton(text="Мои реквезиты", callback_data = "menu_4")],
+                  [InlineKeyboardButton(text="Общий чат партнеров", callback_data = "menu_5")],
+                  [InlineKeyboardButton(text="Условия партнерства", callback_data = "menu_6")],
+                  [InlineKeyboardButton(text="Добавить партнера", callback_data = "menu_7")],
+                  [InlineKeyboardButton(text="Связь с менеджером", callback_data = "menu_8")]
                   ],
         
     )
