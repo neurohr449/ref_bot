@@ -85,10 +85,12 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
 
 
 async def reg_2(message: Message, state: FSMContext):
-    
+    user_data = state.get_data()
+    sheet_id = user_data.get('sheet_id')
+    user_id = message.from_user.id
     phone_number = message.contact.phone_number
     if phone_number:
-        if await check_user_reg == False:
+        if await check_user_reg(sheet_id, user_id) == False:
             await state.update_data(phone=phone_number)
             await message.answer(text = f"Мы не нашли личный кабинет по номеру телефона {phone_number}. Давайте зарегистрируем вас.  \n\n✏️ Пожалуйста, введите ваше имя, чтобы продолжить.", reply_markup=None)
             await state.set_state(UserState.reg_2)
