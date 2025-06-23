@@ -94,7 +94,7 @@ async def reg_4(message: Message, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Далее", callback_data="next"),InlineKeyboardButton(text="Изменить", callback_data="change")]
     ])
-    await message.answer(text=text)
+    await message.answer(text=text, reply_markup = keyboard)
     await state.set_state(UserState.reg_4)
 
 ###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###
