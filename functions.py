@@ -135,11 +135,10 @@ async def get_user_reg(sheet_id, user_id):
     
     
     
-    for  row in enumerate(data, start=2):  
-        if f"{user_id}" == row[0]:
-            phone = row[4]
-            user_name = [2]
-            return phone, user_name
+    for row in data:  
+        if str(user_id) == str(row.get('id Партнера', '')):
+            user_name = str(row.get('Имя', ''))
+            return user_name
     
     
 
