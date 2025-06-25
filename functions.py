@@ -120,28 +120,28 @@ async def check_user_reg(sheet_id, user_id):
     data = await asyncio.to_thread(sheet.get_all_records)
     
     if not data or not isinstance(data, list):
-        return False, None, None
+        return False
     
-    for row in enumerate(data, start=2):
-        
-        if isinstance(row, dict):
-            partner_id = row.get('id Партнера', '')  
-            if f"{user_id}" == partner_id:
-                phone = row.get('Номер телефона')
-                user_name = row.get('Имя')
-                return True, phone, user_name
-        
-        
-        elif isinstance(row, tuple):
-            
-            partner_id = row[0] if len(row) > 0 else ''
-            if f"{user_id}" == partner_id:
-                phone = row[4] if len(row) > 1 else None  
-                user_name = row[2] if len(row) > 2 else None  
-                return True, phone, user_name
+    for  row in enumerate(data, start=2):  
+        if f"{user_id}" == row.get('id Партнера', ''):
+            return True
     
-    return False, None, None
+    return False
 
+
+async def get_user_reg(sheet_id, user_id):
+    sheet = await get_google_sheet(sheet_id, 2)
+    data = await asyncio.to_thread(sheet.get_all_records)
+    
+    
+    
+    for  row in enumerate(data, start=2):  
+        if f"{user_id}" == row.get('id Партнера', ''):
+            phone = row.get('Номер телефона', '')
+            user_name = row.get('Имя', '')
+            return phone, user_name
+    
+    
 
 async def write_to_google_sheet(
     sheet_id: str,

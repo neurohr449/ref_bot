@@ -91,13 +91,14 @@ async def reg_2(message: Message, state: FSMContext):
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
     phone_number = message.contact.phone_number
-    user_reg_status, phone, user_name = await check_user_reg(sheet_id, user_id)
+    user_reg_status = await check_user_reg(sheet_id, user_id)
     if phone_number:
         if user_reg_status == False:
             await state.update_data(phone=phone_number)
             await message.answer(text = f"Мы не нашли личный кабинет по номеру телефона {phone_number}. Давайте зарегистрируем вас.  \n\n✏️ Пожалуйста, введите ваше имя, чтобы продолжить.", reply_markup=ReplyKeyboardRemove())
             await state.set_state(UserState.reg_2)
         else:
+            phone, user_name = await get_user_reg(sheet_id, user_id)
             await state.update_data(phone=phone, user_name = user_name)
             await menu_message(message, state)
     else:
