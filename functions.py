@@ -114,7 +114,7 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
         
 
 
-
+#
 async def check_user_reg(sheet_id, user_id):
     sheet = await get_google_sheet(sheet_id, 2)
     data = await asyncio.to_thread(sheet.get_all_records)
