@@ -24,6 +24,7 @@ TELEGRAM_VIDEO_PATTERN = r'https://t\.me/'
 
 
 async def menu_message(message: Message, state: FSMContext):
+    await state.set_state(UserState.menu)
     user_data = await state.get_data()
     name = user_data.get('user_name')
     text = f"🏠 Главное меню 🎉 {name}, рады видеть вас снова! Выберите необходимый раздел для работы с вашими рекомендациями."
@@ -42,6 +43,7 @@ async def menu_message(message: Message, state: FSMContext):
     await message.answer(text=text,reply_markup=keyboard)
 
 async def menu(callback_query: CallbackQuery, state: FSMContext):
+    await state.set_state(UserState.menu)
     user_data = await state.get_data()
     name = user_data.get('user_name')
     text = f"🏠 Главное меню 🎉 {name}, рады видеть вас снова! Выберите необходимый раздел для работы с вашими рекомендациями."
