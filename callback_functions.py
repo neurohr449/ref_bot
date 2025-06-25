@@ -457,7 +457,7 @@ async def client_status_2(callback_query: CallbackQuery, state: FSMContext):
     elif status == "denied":
         func_status = "Отказано"
     lead_list = await read_lead_google_sheet(sheet_id, user_id, func_status)
-    text = f"Список клиентов по статусу: {func_status}\n\n "
+    text = f"Список клиентов по статусу: {func_status}\n\n {lead_list}"
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
@@ -477,11 +477,17 @@ async def ref_link_1(callback_query: CallbackQuery, state: FSMContext):
 
 async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change)
-    user_data = await state.get_data()
+    
     card_number = None
     bank_name = None
     bank_sbp = None
     bank_fio = None
+    await state.update_data(card_number = None,
+                            bank_name = None,
+                            bank_sbp = None,
+                            bank_fio = None
+                            )
+    user_data = await state.get_data()
     card_number = user_data.get('card_number')
     bank_name = user_data.get('bank_name')
     bank_sbp = user_data.get('bank_sbp')
@@ -562,12 +568,18 @@ async def bank_info_change_fio_2(message: Message, state: FSMContext):
 async def chat_link(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     text = user_data.get('partner_chat')
-    await callback_query.message.answer(text = text)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+            ])
+    await callback_query.message.answer(text = text, reply_markup = keyboard)
 
 async def tos(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     text = user_data.get('tos')
-    await callback_query.message.answer(text = text)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+            ])
+    await callback_query.message.answer(text = text, reply_markup = keyboard)
 
 async def add_partner_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.add_partner_1)

@@ -296,7 +296,7 @@ async def change_bank_info_google_sheet(
         
         user_row = None
         for i, row in enumerate(data, start=2): 
-            if f"{user_id}".lower() == row.get('ID Партнера', '').lower():
+            if f"{user_id}" == row.get('ID Партнера', '').lower():
                 user_row = i
                 break
         
