@@ -120,7 +120,7 @@ async def check_user_reg(sheet_id, user_id):
     data = await asyncio.to_thread(sheet.get_all_records)
     user_row = None
     for i, row in enumerate(data, start=2):  
-        if f"{user_id}".lower() == row.get('id Партнера', '').lower():
+        if f"{user_id}" == row.get('id Партнера', ''):
             user_row = i
             break
 
