@@ -118,16 +118,19 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
 async def check_user_reg(sheet_id, user_id):
     sheet = await get_google_sheet(sheet_id, 2)
     data = await asyncio.to_thread(sheet.get_all_records)
-    user_row = None
-    for i, row in enumerate(data, start=2):  
+    
+    
+    if not data or not isinstance(data, list):
+        return False, None, None
+    
+    for  row in enumerate(data, start=2):  
         if f"{user_id}" == row.get('id Партнера', ''):
-            user_row = i
-            break
-
-    if user_row:
-        return True
-    else:
-        return False
+            phone = row.get('Номер телефона')
+            user_name = row.get('Имя')
+            return True, phone, user_name  
+    
+    
+    return False, None, None
 
 
 async def write_to_google_sheet(
