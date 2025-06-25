@@ -123,7 +123,7 @@ async def check_user_reg(sheet_id, user_id):
         return False
     
     for  row in enumerate(data, start=2):  
-        if f"{user_id}" == row.get('id Партнера', ''):
+        if f"{user_id}" == row[0]:
             return True
     
     return False
@@ -136,9 +136,9 @@ async def get_user_reg(sheet_id, user_id):
     
     
     for  row in enumerate(data, start=2):  
-        if f"{user_id}" == row.get('id Партнера', ''):
-            phone = row.get('Номер телефона', '')
-            user_name = row.get('Имя', '')
+        if f"{user_id}" == row[0]:
+            phone = row[4]
+            user_name = [2]
             return phone, user_name
     
     
