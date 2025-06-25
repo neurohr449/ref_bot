@@ -267,9 +267,9 @@ async def read_lead_google_sheet(
         data = await asyncio.to_thread(sheet.get_all_records)
         
         ref_status = []
-        for i, row in enumerate(data, start=2): 
-            if f"{user_id}".lower() == row.get('ID Партнера', '').lower() and lead_status.lower() == row.get('Статус', '').lower():
-                ref_name = row.get('Имя', '').lower()
+        for row in enumerate(data, start=2): 
+            if f"{user_id}" == row.get('ID Партнера', '') and lead_status.lower() == row.get('Статус', '').lower():
+                ref_name = row.get('Имя', '')
                 ref_phone = row.get('Номер телефона', '').lower()
                 ref_status.append(f"{ref_name}, {ref_phone}\n")
                 
@@ -280,7 +280,7 @@ async def read_lead_google_sheet(
 
 
     except Exception as e:
-        print(f"Ошибка записи в Google Sheets: {e}")
+        print(f"Ошибка чтения Google Sheets: {e}")
         return False
     
 async def change_bank_info_google_sheet(
