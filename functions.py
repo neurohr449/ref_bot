@@ -167,11 +167,12 @@ async def write_to_google_sheet(
         sheet = await get_google_sheet(sheet_id, 2)
         data = await asyncio.to_thread(sheet.get_all_records)
         
+                   
         user_row = None
-        for i, row in enumerate(data, start=2):  # начинаем с 2, так как первая строка - заголовки
-            if f"{user_id}".lower() == row.get('id Партнера', '').lower():
-                user_row = i
-                break
+        for i, row in data:  
+                if str(user_id) == str(row.get('id Партнера', '')):
+                    user_row = i
+                    break
         
        
         update_data = {}
@@ -244,11 +245,13 @@ async def write_to_lead_google_sheet(
         data = await asyncio.to_thread(sheet.get_all_records)
         
         user_row = None
-        for i, row in enumerate(data, start=2): 
-            if f"{ref_phone}".lower() == row.get('Номер телефона', '').lower():
-                user_row = i
-                break
+        for i, row in data:  
+                if str(ref_phone) == str(row.get('Номер телефона', '')):
+                    user_row = i
+                    break
+
         ref_id = ref_phone
+
         status = "Рекомендация в работе"
                
         if user_row:

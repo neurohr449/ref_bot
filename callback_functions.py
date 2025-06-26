@@ -484,7 +484,10 @@ async def client_status_2(callback_query: CallbackQuery, state: FSMContext):
     elif status == "denied":
         func_status = "Отказано"
     lead_list = await read_lead_google_sheet(sheet_id, user_id, func_status)
-    text = f"Список клиентов по статусу: {func_status}\n\n {lead_list}"
+
+    formatted_lead_list = "".join(lead_list).strip()
+
+    text = f"Список клиентов по статусу: {func_status}\n\n {formatted_lead_list}"
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
