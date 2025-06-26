@@ -138,7 +138,11 @@ async def get_user_reg(sheet_id, user_id):
     for row in data:  
         if str(user_id) == str(row.get('id Партнера', '')):
             user_name = str(row.get('Имя', ''))
-            return user_name
+            bank_card = str(row.get('Инормация для выплат Номер карты', ''))
+            bank_bank = str(row.get('Инормация для выплат Банк', ''))
+            bank_sbp = str(row.get('Инормация для выплат Номер телефона СБП', ''))
+            bank_fio = str(row.get('Инормация для выплат Имя получателя', ''))
+            return user_name, bank_card, bank_bank, bank_sbp, bank_fio
     
     
 
@@ -279,10 +283,10 @@ async def read_lead_google_sheet(
         data = await asyncio.to_thread(sheet.get_all_records)
         
         ref_status = []
-        for row in enumerate(data, start=2): 
-            if f"{user_id}" == row.get('ID Партнера', '') and lead_status.lower() == row.get('Статус', '').lower():
+        for row in data:  
+            if str(user_id) == str(row.get('id Партнера', '')) and lead_status == str(row.get('Статус', '')):
                 ref_name = row.get('Имя', '')
-                ref_phone = row.get('Номер телефона', '').lower()
+                ref_phone = row.get('Номер телефона', '')
                 ref_status.append(f"{ref_name}, {ref_phone}\n")
                 
         
@@ -306,20 +310,17 @@ async def change_bank_info_google_sheet(
         sheet = await get_google_sheet(sheet_id, 2)
         data = await asyncio.to_thread(sheet.get_all_records)
         
-        user_row = None
-        for i, row in enumerate(data, start=2): 
-            if f"{user_id}" == row.get('ID Партнера', '').lower():
-                user_row = i
-                break
-        
-        if bank_info == "card":
-            await asyncio.to_thread(sheet.update, f'F{user_row}', [subject_to_change])
-        elif bank_info == "bank":
-            await asyncio.to_thread(sheet.update, f'G{user_row}', [subject_to_change])
-        elif bank_info == "sbp":
-            await asyncio.to_thread(sheet.update, f'H{user_row}', [subject_to_change])
-        elif bank_info == "fio":
-            await asyncio.to_thread(sheet.update, f'I{user_row}', [subject_to_change])
+        for row in data:  
+            if str(user_id) == str(row.get('id Партнера', '')):
+                
+                if bank_info == "card":
+                    await asyncio.to_thread(sheet.update, f'F{row}', [subject_to_change])
+                elif bank_info == "bank":
+                    await asyncio.to_thread(sheet.update, f'G{row}', [subject_to_change])
+                elif bank_info == "sbp":
+                    await asyncio.to_thread(sheet.update, f'H{row}', [subject_to_change])
+                elif bank_info == "fio":
+                    await asyncio.to_thread(sheet.update, f'I{row}', [subject_to_change])
 
 
         return        
