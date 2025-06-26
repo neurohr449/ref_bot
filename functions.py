@@ -309,17 +309,19 @@ async def change_bank_info_google_sheet(
         sheet = await get_google_sheet(sheet_id, 2)
         data = await asyncio.to_thread(sheet.get_all_records)
         
-        for row in data:  
+        column_map = {
+            "card": "F",
+            "bank": "G",
+            "sbp": "H",
+            "fio": "I"
+        }
+        column = column_map[bank_info]
+
+        for i, row in enumerate(data, start=2):  
             if str(user_id) == str(row.get('id Партнера', '')):
-                
-                if bank_info == "card":
-                    await asyncio.to_thread(sheet.update, f'F{row}', [subject_to_change])
-                elif bank_info == "bank":
-                    await asyncio.to_thread(sheet.update, f'G{row}', [subject_to_change])
-                elif bank_info == "sbp":
-                    await asyncio.to_thread(sheet.update, f'H{row}', [subject_to_change])
-                elif bank_info == "fio":
-                    await asyncio.to_thread(sheet.update, f'I{row}', [subject_to_change])
+                cell = f"{column}{i}"
+                await asyncio.to_thread(sheet.update, cell, [[subject_to_change]])
+                break  
 
 
         return        

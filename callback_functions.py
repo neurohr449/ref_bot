@@ -524,6 +524,25 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
             ])
     await callback_query.message.answer(text = text, reply_markup = keyboard)
 
+async def bank_info_1_message(message: Message, state: FSMContext):
+    await state.set_state(UserState.bank_info_change)
+    
+    
+    user_data = await state.get_data()
+    card_number = user_data.get('bank_card', "❌ не указан")
+    bank_name = user_data.get('bank_bank', "❌ не указан")
+    bank_sbp = user_data.get('bank_sbp', "❌ не указан")
+    bank_fio = user_data.get('bank_fio', "❌ не указан")
+    text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
+             InlineKeyboardButton(text="Банк", callback_data="bank")],
+             [InlineKeyboardButton(text="Телефон(СБП)", callback_data="sbp"),
+             InlineKeyboardButton(text="ФИО получателя", callback_data="fio")],
+             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
+            ])
+    await message.answer(text = text, reply_markup = keyboard)
+
 async def bank_info_change_card_number(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.card_number_change)
     user_data = await state.get_data()
@@ -552,40 +571,44 @@ async def bank_info_change_fio(callback_query: CallbackQuery, state: FSMContext)
     await callback_query.message.answer(text = text)
 
 async def bank_info_change_card_number_2(message: Message, state: FSMContext):
-    await state.update_data(card_number = message.text)
+    card_number = message.text
+    await state.update_data(card_number = card_number)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
     bank_info = "card"
-    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, message.text)
-    await bank_info_1(message, state)
+    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, card_number)
+    await bank_info_1_message(message, state)
 
 async def bank_info_change_bank_2(message: Message, state: FSMContext):
-    await state.update_data(bank_name = message.text)
+    bank_name = message.text
+    await state.update_data(bank_name = bank_name)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
     bank_info = "bank"
-    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, message.text)
-    await bank_info_1(message, state)
+    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, bank_name)
+    await bank_info_1_message(message, state)
 
 async def bank_info_change_sbp_2(message: Message, state: FSMContext):
-    await state.update_data(bank_sbp = message.text)
+    bank_sbp = message.text
+    await state.update_data(bank_sbp = bank_sbp)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
     bank_info = "sbp"
-    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, message.text)
-    await bank_info_1(message, state)
+    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, bank_sbp)
+    await bank_info_1_message(message, state)
 
 async def bank_info_change_fio_2(message: Message, state: FSMContext):
-    await state.update_data(bank_fio = message.text)
+    bank_fio = message.text
+    await state.update_data(bank_fio = bank_fio)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
     bank_info = "fio"
-    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, message.text)
-    await bank_info_1(message, state)
+    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, bank_fio)
+    await bank_info_1_message(message, state)
 
 async def chat_link(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
