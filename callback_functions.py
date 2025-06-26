@@ -573,7 +573,7 @@ async def bank_info_change_fio(callback_query: CallbackQuery, state: FSMContext)
 
 async def bank_info_change_card_number_2(message: Message, state: FSMContext):
     card_number = message.text
-    await state.update_data(card_number = card_number)
+    await state.update_data(bank_card = card_number)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
@@ -583,7 +583,7 @@ async def bank_info_change_card_number_2(message: Message, state: FSMContext):
 
 async def bank_info_change_bank_2(message: Message, state: FSMContext):
     bank_name = message.text
-    await state.update_data(bank_name = bank_name)
+    await state.update_data(bank_bank = bank_name)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
