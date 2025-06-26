@@ -281,12 +281,12 @@ async def read_lead_google_sheet(
     try:
         sheet = await get_google_sheet(sheet_id, 3)
         data = await asyncio.to_thread(sheet.get_all_records)
-        
+        print (data)
         ref_status = []
         for row in data:  
             if str(user_id) == str(row.get('id Партнера', '')) and lead_status == str(row.get('Статус', '')):
-                ref_name = row.get('Имя', '')
-                ref_phone = row.get('Номер телефона', '')
+                ref_name = str(row.get('Имя', ''))
+                ref_phone = str(row.get('Номер телефона', ''))
                 ref_status.append(f"{ref_name}, {ref_phone}\n")
                 
         
