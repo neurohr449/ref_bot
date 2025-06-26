@@ -438,7 +438,7 @@ async def send_client_4(message: Message, state: FSMContext):
             ])
     await message.answer(text = text, reply_markup = keyboard)
 
-
+#
 async def send_client_5(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     client_name = user_data.get('lead_fio')
