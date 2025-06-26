@@ -116,7 +116,7 @@ async def reg_2(message: Message, state: FSMContext):
             await message.answer(text = f"Мы не нашли личный кабинет по номеру телефона {phone_number}. Давайте зарегистрируем вас.  \n\n✏️ Пожалуйста, введите ваше имя, чтобы продолжить.", reply_markup=ReplyKeyboardRemove())
             await state.set_state(UserState.reg_2)
         else:
-            
+            await message.answer(reply_markup=ReplyKeyboardRemove())
             await menu_message(message, state)
     else:
         await message.answer("Не удалось получить номер телефона. Попробуйте снова", reply_markup=FAIL_KEYBOARD)
@@ -544,28 +544,28 @@ async def bank_info_1_message(message: Message, state: FSMContext):
     await message.answer(text = text, reply_markup = keyboard)
 
 async def bank_info_change_card_number(callback_query: CallbackQuery, state: FSMContext):
-    await state.set_state(UserState.card_number_change)
+    await state.set_state(UserState.bank_info_change_card_number)
     user_data = await state.get_data()
     text = user_data.get('bank_1')
     await callback_query.message.answer(text = text)
 
 
 async def bank_info_change_bank(callback_query: CallbackQuery, state: FSMContext):
-    await state.set_state(UserState.bank_change)
+    await state.set_state(UserState.bank_info_change_bank)
     user_data = await state.get_data()
     text = user_data.get('bank_2')
     await callback_query.message.answer(text = text)
 
 
 async def bank_info_change_sbp(callback_query: CallbackQuery, state: FSMContext):
-    await state.set_state(UserState.sbp_change)
+    await state.set_state(UserState.bank_info_change_sbp)
     user_data = await state.get_data()
     text = user_data.get('bank_3')
     await callback_query.message.answer(text = text)
 
 
 async def bank_info_change_fio(callback_query: CallbackQuery, state: FSMContext):
-    await state.set_state(UserState.bank_fio_change)
+    await state.set_state(UserState.bank_info_change_fio)
     user_data = await state.get_data()
     text = user_data.get('bank_4')
     await callback_query.message.answer(text = text)
