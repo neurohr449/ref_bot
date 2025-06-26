@@ -231,7 +231,7 @@ async def write_to_google_sheet(
         print(f"Ошибка записи в Google Sheets: {e}")
         return False
     
-
+#
 async def write_to_lead_google_sheet(
     sheet_id: str,
     first_name: str,
