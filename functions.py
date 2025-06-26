@@ -244,30 +244,26 @@ async def write_to_lead_google_sheet(
         sheet = await get_google_sheet(sheet_id, 3)
         data = await asyncio.to_thread(sheet.get_all_records)
         
-        user_row = None
-        for i, row in data:  
-                if str(ref_phone) == str(row.get('Номер телефона', '')):
-                    user_row = i
-                    break
+        for row in data:
+            if str(ref_phone) == str(row.get('Номер телефона', '')):
+                return 
 
         ref_id = ref_phone
 
         status = "Рекомендация в работе"
                
-        if user_row:
-            return False
-        else:
+        
             
-            new_row = [
-                ref_id,                                     # A id Реферала
-                first_name,                                 # B Имя
-                ref_phone or "",                            # C Номер телефона
-                user_id,                                    # D id Партнера
-                f"https://t.me/{username}" or "" ,          # E Ссылка на партнера    
-                status                                      # F Статус
-                ]
-            
-            await asyncio.to_thread(sheet.append_row, new_row)
+        new_row = [
+            ref_id,                                     # A id Реферала
+            first_name,                                 # B Имя
+            ref_phone or "",                            # C Номер телефона
+            user_id,                                    # D id Партнера
+            f"https://t.me/{username}" or "" ,          # E Ссылка на партнера    
+            status                                      # F Статус
+            ]
+        
+        await asyncio.to_thread(sheet.append_row, new_row)
         
         return True
     except Exception as e:

@@ -510,18 +510,10 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     
     
     user_data = await state.get_data()
-    card_number = user_data.get('bank_card')
-    if not card_number:
-        card_number = ""
-    bank_name = user_data.get('bank_bank')
-    if not bank_name:
-        bank_name = ""
-    bank_sbp = user_data.get('bank_sbp')
-    if not bank_sbp:
-        bank_sbp = ""
-    bank_fio = user_data.get('bank_fio')
-    if not bank_fio:
-        bank_fio = ""
+    card_number = user_data.get('bank_card', "❌ не указан")
+    bank_name = user_data.get('bank_bank', "❌ не указан")
+    bank_sbp = user_data.get('bank_sbp', "❌ не указан")
+    bank_fio = user_data.get('bank_fio', "❌ не указан")
     text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
