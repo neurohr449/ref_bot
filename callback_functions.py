@@ -597,7 +597,7 @@ async def chat_link(callback_query: CallbackQuery, state: FSMContext):
 
 async def tos(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    text = user_data.get('tos')
+    text = "В разработке"
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])

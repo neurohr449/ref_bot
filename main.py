@@ -165,7 +165,7 @@ async def ref_link_1_handler(callback_query: CallbackQuery, state: FSMContext) -
 
 
 ############
-@router.callback_query(lambda c: c.data == 'menu_3')
+@router.callback_query(lambda c: c.data == 'menu_4')
 async def bank_info_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await bank_info_1(callback_query, state)
 
