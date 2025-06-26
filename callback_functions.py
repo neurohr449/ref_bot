@@ -55,7 +55,7 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.menu)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
-    user_id = callback_query.message.from_user.id
+    user_id = callback_query.from_user.id
     user_name, bank_card, bank_bank, bank_sbp, bank_fio = await get_user_reg(sheet_id, user_id)
     await state.update_data(user_name = user_name,
                             bank_card=bank_card,
@@ -505,18 +505,10 @@ async def ref_link_1(callback_query: CallbackQuery, state: FSMContext):
 async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change)
     
-    card_number = None
-    bank_name = None
-    bank_sbp = None
-    bank_fio = None
-    await state.update_data(card_number = None,
-                            bank_name = None,
-                            bank_sbp = None,
-                            bank_fio = None
-                            )
+    
     user_data = await state.get_data()
-    card_number = user_data.get('card_number')
-    bank_name = user_data.get('bank_name')
+    card_number = user_data.get('bank_card')
+    bank_name = user_data.get('bank_bank')
     bank_sbp = user_data.get('bank_sbp')
     bank_fio = user_data.get('bank_fio')
     text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
