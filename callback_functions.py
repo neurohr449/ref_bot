@@ -188,7 +188,7 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
                                     status = "Начал обучение"
                                     )
         chat_text = f"Новый партнер прошел регистрацию\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
-        chat_id = callback_query.message.chat.id
+        chat_id = user_data.get('notification_chat')
         await chat_notification(chat_id, chat_text)
         await get_table_data(sheet_id, 1, state)
         user_data = await state.get_data()
@@ -438,7 +438,7 @@ async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
     user_phone = user_data.get('phone')
     first_name=user_data.get('user_name')
     last_name=user_data.get('user_last_name')
-    chat_id = callback_query.message.chat.id
+    chat_id = user_data.get('notification_chat')
     chat_text = f"Партнер прошел обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
     await chat_notification(chat_id, chat_text)
     await state.set_state(UserState.menu)
@@ -506,7 +506,7 @@ async def send_client_5(callback_query: CallbackQuery, state: FSMContext):
         ref_cash=ref_cash
     )
     chat_text = f"Новый клиент\n\n Имя: {client_name}\nНомер телефона: {lead_phone}"
-    chat_id = callback_query.message.chat.id
+    chat_id = user_data.get('notification_chat')
     await chat_notification(chat_id, chat_text)
     text = f"Данные переданы менеджеру.   \n\nИмя клиента: {client_name} \nНомер телефона: {lead_phone}   \n\nИнформацию о данном клиенте можно увидеть в разделе \"Узнать статус клиентов\""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -582,6 +582,7 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
                 ])
         await callback_query.message.answer(text = text, reply_markup = keyboard)
     else:
+        text = user_data.get('empty_bank_info')
         await callback_query.message.answer(text = text)
         await full_bank_info_cb_1(callback_query, state)
 
@@ -744,7 +745,7 @@ async def chat_link(callback_query: CallbackQuery, state: FSMContext):
 
 async def tos(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    text = "В разработке"
+    text = user_data.get('tos')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])
