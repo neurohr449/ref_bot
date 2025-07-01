@@ -181,7 +181,7 @@ async def write_to_google_sheet(
         
                    
         user_row = None
-        for i, row in enumerate(data, start=1):
+        for i, row in enumerate(data, start=2):
                 if str(user_id) == str(row.get('id Партнера', '')):
                     user_row = i
                     break
@@ -229,7 +229,7 @@ async def write_to_google_sheet(
         else:
             
             new_row = [
-                user_id,                                     # A Дата
+                user_id,                                     # A id Партнера
                 f"@{username}",                              # B ТГ Ник
                 f"https://t.me/{username}",                  # C Ссылка на партнера
                 first_name or "",                            # D Имя
