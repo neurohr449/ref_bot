@@ -128,7 +128,7 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
 
 
 #
-async def check_user_reg(sheet_id, user_id):
+async def check_user_reg(sheet_id, user_id, phone_number):
     sheet = await get_google_sheet(sheet_id, 2)
     data = await asyncio.to_thread(sheet.get_all_records)
     
@@ -136,7 +136,7 @@ async def check_user_reg(sheet_id, user_id):
         return False
     
     for row in data:  
-        if str(user_id) == str(row.get('id Партнера', '')):
+        if str(user_id) == str(row.get('id Партнера', '')) and str(phone_number) == str(row.get('Номер телефона', '')):
             return True
     
     return False
