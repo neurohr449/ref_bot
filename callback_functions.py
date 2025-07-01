@@ -119,8 +119,10 @@ async def reg_2(message: Message, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
-    phone_number = message.contact.phone_number
-    phone_number_2 = message.text
+    if message.contact.phone_number:
+        phone_number = message.contact.phone_number
+    if message.text:
+        phone_number_2 = message.text
     pattern = re.compile(r'^\+7\d{10}$')
     match = re.fullmatch(pattern, phone_number)
     match_2 = re.fullmatch(pattern, phone_number_2)
