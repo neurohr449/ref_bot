@@ -60,7 +60,7 @@ async def command_start_handler(message: Message, command: CommandObject, state:
     await state.update_data(sheet_id=sheet_id,
                             ref_id=ref_id,
                             func_id=func_id)
-    text = "👋 Добро пожаловать в нашу партнёрскую программу!\n\nВ этом Телеграм-боте доступен ваш личный кабинет партнёра:    \n\n— ➕ Добавление новых рекомендаций    \n\n— 🔄 Статусы добавленных рекомендаций    \n\n— 💰 Выплаты    \n\n— 🎓 Обучение и условия    \n\n— 📞 Связь с персональным менеджеромЧтобы начать зарабатывать на рекомендациях, осталось только зарегистрироваться!"
+    text = "👋 Добро пожаловать в нашу партнёрскую программу!\n\nВ этом Телеграм-боте доступен ваш личный кабинет партнёра:    \n\n— ➕ Добавление новых рекомендаций    \n\n— 🔄 Статусы добавленных рекомендаций    \n\n— 💰 Выплаты    \n\n— 🎓 Обучение и условия    \n\n— 📞 Связь с персональным менеджером\n\nЧтобы начать зарабатывать на рекомендациях, осталось только зарегистрироваться!"
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Регистрация", callback_data="next")]
     ])
@@ -230,9 +230,17 @@ async def add_partner_3_handler(message: Message, state: FSMContext) -> None:
 async def contact_us_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await contact_us(callback_query, state)
 
+@router.callback_query(lambda c: c.data == 'menu_9')
+async def pd_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await pd(callback_query, state)
 
+@router.callback_query(lambda c: c.data == 'menu_10')
+async def oferta_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await oferta(callback_query, state)
 
-
+async def chat_notification(chat_id, text):
+    await bot.send_message(chat_id=chat_id,
+                           text=text)
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)

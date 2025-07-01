@@ -56,37 +56,50 @@ async def get_google_sheet(sheet_id: str, list_index: int):
         print(f"Ошибка доступа к Google Sheets: {e}")
         raise
 
+async def get_range_data(sheet_id, worksheet, state: FSMContext):
+    range_name = "B2:B2"
+    value = await get_google_sheet_data(sheet_id, range_name, worksheet)
+    row_data = value[0]
+    return row_data[0]
+
 async def get_table_data(sheet_id, worksheet, state: FSMContext):
     
     if worksheet == 0:
-        range_name = "B2:V2"
+        
+        range_name = await get_range_data(sheet_id, worksheet, state)
         value = await get_google_sheet_data(sheet_id, range_name, worksheet)
         row_data = value[0]
         await state.update_data(
             notification_chat=row_data[0],
-            reg_1=row_data[1],
-            reg_2=row_data[2],
-            reg_3=row_data[3],
-            send_client_1=row_data[4],
-            send_client_2=row_data[5],
-            send_client_3=row_data[6],
-            client_status=row_data[7],
-            ref_link_1=row_data[8],
-            ref_link_2=row_data[9],
-            bank_1=row_data[10],
-            bank_2=row_data[11],
-            bank_3=row_data[12],
-            bank_4=row_data[13],
-            partner_chat=row_data[14],
-            tos=row_data[15],
-            add_partner_1=row_data[16],
-            add_partner_2=row_data[17],
-            add_partner_3=row_data[18],
-            add_partner_4=row_data[19],
-            add_partner_5=row_data[20]
+            cash_amount=row_data[2],
+            reg_1=row_data[3],
+            reg_2=row_data[4],
+            reg_3=row_data[5],
+            send_client_1=row_data[6],
+            send_client_2=row_data[7],
+            send_client_3=row_data[8],
+            client_status=row_data[9],
+            ref_link_1=row_data[10],
+            ref_link_2=row_data[11],
+            empty_bank_info=row_data[12],
+            bank_1=row_data[13],
+            bank_2=row_data[14],
+            bank_3=row_data[15],
+            bank_4=row_data[16],
+            partner_chat=row_data[17],
+            tos=row_data[18],
+            add_partner_1=row_data[19],
+            add_partner_2=row_data[20],
+            add_partner_3=row_data[21],
+            add_partner_4=row_data[22],
+            add_partner_5=row_data[23],
+            pd=row_data[24],
+            oferta=row_data[25]
             )
     elif worksheet == 1:
-        range_name = "A2:T2"
+        user_data = await state.get_data()
+        range_id = user_data.get('func_id')
+        range_name = f"A{range_id}:T{range_id}"
         value = await get_google_sheet_data(sheet_id, range_name, worksheet)
         row_data = value[0]
         await state.update_data(
@@ -150,19 +163,18 @@ async def write_to_google_sheet(
     sheet_id: str,
     user_id: str,
     username: str,
-    first_name: str,
-    last_name: str,
-    user_phone: str,
+    first_name: str = None,
+    last_name: str = None,
+    user_phone: str = None,
     bank_info_card_number: str = None,
     bank_info_bank: str = None,
     bank_info_sbp: str = None,
-    bank_info_fio: str = None
+    bank_info_fio: str = None,
+    status: str = None
 ) -> bool:
 
     try:
-        if not username:
-            print("Ошибка: username обязателен")
-            return False
+        
 
         sheet = await get_google_sheet(sheet_id, 2)
         data = await asyncio.to_thread(sheet.get_all_records)
@@ -181,13 +193,15 @@ async def write_to_google_sheet(
             update_data = {
                 'id Партнера': user_id,
                 'ТГ Ник': f"@{username}",
+                'Ссылка на партнера': f"https://t.me/{username}",
                 'Имя': first_name,
                 'Фамилия': last_name,
                 'Номер телефона': user_phone,
                 'Инормация для выплат Номер карты': bank_info_card_number or "",
                 'Инормация для выплат Банк': bank_info_bank or "",
                 'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
-                'Инормация для выплат Имя получателя': bank_info_fio or ""
+                'Инормация для выплат Имя получателя': bank_info_fio or "",
+                'Статус': status
             }
         
 
@@ -200,13 +214,15 @@ async def write_to_google_sheet(
             row_values = [
                 current_values.get('id Партнера', ''),                              # A
                 current_values.get('ТГ Ник', ''),                                   # B
-                current_values.get('Имя', ''),                                      # C
-                current_values.get('Фамилия', ''),                                  # D
-                current_values.get('Номер телефона', ''),                           # E
-                current_values.get('Инормация для выплат Номер карты', ''),         # F                                       
-                current_values.get('Инормация для выплат Банк', ''),                # G
-                current_values.get('Инормация для выплат Номер телефона СБП', ''),  # H
-                current_values.get('Инормация для выплат Имя получателя', '')       # I   
+                current_values.get('Ссылка на партнера', ''),                       # C
+                current_values.get('Имя', ''),                                      # D
+                current_values.get('Фамилия', ''),                                  # E
+                current_values.get('Номер телефона', ''),                           # F
+                current_values.get('Инормация для выплат Номер карты', ''),         # G                                       
+                current_values.get('Инормация для выплат Банк', ''),                # H
+                current_values.get('Инормация для выплат Номер телефона СБП', ''),  # I
+                current_values.get('Инормация для выплат Имя получателя', ''),      # J  
+                current_values.get('Статус', '')                                    # K
             ]
             
             await asyncio.to_thread(sheet.update, f'A{user_row}:S{user_row}', [row_values])
@@ -215,13 +231,15 @@ async def write_to_google_sheet(
             new_row = [
                 user_id,                                     # A Дата
                 f"@{username}",                              # B ТГ Ник
-                first_name or "",                            # C Имя
-                last_name,                                   # D Фамилия
-                user_phone,                                  # E Номер телефона
-                bank_info_card_number or "",                 # F Инормация для выплат Номер карты
-                bank_info_bank or "",                        # G Инормация для выплат Банк
-                bank_info_sbp or "",                         # H Инормация для выплат Номер телефона СБП
-                bank_info_fio or "",                         # I Инормация для выплат Имя получателя
+                f"https://t.me/{username}",                  # C Ссылка на партнера
+                first_name or "",                            # D Имя
+                last_name,                                   # E Фамилия
+                user_phone,                                  # F Номер телефона
+                bank_info_card_number or "",                 # G Инормация для выплат Номер карты
+                bank_info_bank or "",                        # H Инормация для выплат Банк
+                bank_info_sbp or "",                         # I Инормация для выплат Номер телефона СБП
+                bank_info_fio or "",                         # J Инормация для выплат Имя получателя
+                status                                       # K Статус
                 ]
             
             await asyncio.to_thread(sheet.append_row, new_row)
@@ -237,7 +255,8 @@ async def write_to_lead_google_sheet(
     first_name: str,
     ref_phone: str,
     user_id: str,
-    username: str
+    username: str,
+    ref_cash: str
 ) -> bool:
 
     try:
@@ -260,7 +279,8 @@ async def write_to_lead_google_sheet(
             ref_phone or "",                            # C Номер телефона
             user_id,                                    # D id Партнера
             f"https://t.me/{username}" or "" ,          # E Ссылка на партнера    
-            status                                      # F Статус
+            status,                                     # F Статус
+            ref_cash                                    # G Запланированная выплата
             ]
         
         await asyncio.to_thread(sheet.append_row, new_row)
@@ -286,7 +306,8 @@ async def read_lead_google_sheet(
             if str(user_id) == str(row.get('id Партнера', '')) and lead_status == str(row.get('Статус', '')):
                 ref_name = str(row.get('Имя', ''))
                 ref_phone = str(row.get('Номер телефона', ''))
-                ref_status.append(f"{ref_name}, {ref_phone}\n")
+                ref_cash = str(row.get('Запланированная выплата', ''))
+                ref_status.append(f"Имя реферала:{ref_name} \nНомер телефона:{ref_phone} \nЗапланированная выплата: {ref_cash}\n\n")
                 
         
         return ref_status

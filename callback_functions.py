@@ -16,6 +16,8 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 
 from functions import *
 from all_states import *
+from database import *
+from main import chat_notification
 
 FAIL_KEYBOARD = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Попробовать снова", callback_data="retry")]
@@ -45,7 +47,9 @@ async def menu_message(message: Message, state: FSMContext):
                   [InlineKeyboardButton(text="Общий чат партнеров", callback_data = "menu_5"),
                   InlineKeyboardButton(text="Условия партнерства", callback_data = "menu_6")],
                   [InlineKeyboardButton(text="Добавить партнера", callback_data = "menu_7"),
-                  InlineKeyboardButton(text="Связь с менеджером", callback_data = "menu_8")]
+                  InlineKeyboardButton(text="Связь с менеджером", callback_data = "menu_8")],
+                  [InlineKeyboardButton(text="Согласие на обработку персональных данных", callback_data = "menu_9"),
+                  InlineKeyboardButton(text="Оферта", callback_data = "menu_10")]
                   ],
         
     )
@@ -73,7 +77,9 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
                   [InlineKeyboardButton(text="Общий чат партнеров", callback_data = "menu_5"),
                   InlineKeyboardButton(text="Условия партнерства", callback_data = "menu_6")],
                   [InlineKeyboardButton(text="Добавить партнера", callback_data = "menu_7"),
-                  InlineKeyboardButton(text="Связь с менеджером", callback_data = "menu_8")]
+                  InlineKeyboardButton(text="Связь с менеджером", callback_data = "menu_8")],
+                  [InlineKeyboardButton(text="Согласие на обработку персональных данных", callback_data = "menu_9"),
+                  InlineKeyboardButton(text="Оферта", callback_data = "menu_10")]
                   ],
         
     )
@@ -90,6 +96,11 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
     sheet_id = user_data.get('sheet_id')
     await get_table_data(sheet_id, 0, state)
     user_data = await state.get_data()
+    update_status = await write_to_google_sheet(sheet_id=sheet_id,
+                                    user_id=callback_query.from_user.id,
+                                    username=callback_query.from_user.username,
+                                    status="Начал чат-бота"
+                                    )
     text = user_data.get('reg_1')
     text_2 = user_data.get('reg_2')
     contact_keyboard = ReplyKeyboardMarkup(
@@ -109,18 +120,26 @@ async def reg_2(message: Message, state: FSMContext):
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
     phone_number = message.contact.phone_number
-    user_reg_status = await check_user_reg(sheet_id, user_id)
-    if phone_number:
-        if user_reg_status == False:
-            await state.update_data(phone=phone_number)
-            await message.answer(text = f"Мы не нашли личный кабинет по номеру телефона {phone_number}. Давайте зарегистрируем вас.  \n\n✏️ Пожалуйста, введите ваше имя, чтобы продолжить.", reply_markup=ReplyKeyboardRemove())
-            await state.set_state(UserState.reg_2)
+    phone_number_2 = message.text
+    pattern = re.compile(r'^\+7\d{10}$')
+    match = re.fullmatch(pattern, phone_number)
+    match_2 = re.fullmatch(pattern, phone_number_2)
+    if match or match_2:
+        user_reg_status = await check_user_reg(sheet_id, user_id)
+        if phone_number:
+            if user_reg_status == False:
+                await state.update_data(phone=phone_number)
+                await message.answer(text = f"Мы не нашли личный кабинет по номеру телефона {phone_number}. Давайте зарегистрируем вас.  \n\n✏️ Пожалуйста, введите ваше имя, чтобы продолжить.", reply_markup=ReplyKeyboardRemove())
+                await state.set_state(UserState.reg_2)
+            else:
+                text = "Нашли ваш профиль!"
+                await message.answer(text = text, reply_markup=ReplyKeyboardRemove())
+                await menu_message(message, state)
         else:
-            text = "Нашли ваш профиль!"
-            await message.answer(text = text, reply_markup=ReplyKeyboardRemove())
-            await menu_message(message, state)
+            await message.answer("Не удалось получить номер телефона. Попробуйте снова", reply_markup=FAIL_KEYBOARD)
     else:
-        await message.answer("Не удалось получить номер телефона. Попробуйте снова", reply_markup=FAIL_KEYBOARD)
+        await message.answer("Введите телефон в формате +7xxxxxxxxxx")
+
 
 async def reg_3(message: Message, state: FSMContext):
     user_data = await state.get_data()
@@ -142,6 +161,7 @@ async def reg_4(message: Message, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Далее", callback_data="next"),InlineKeyboardButton(text="Изменить", callback_data="change")]
     ])
+    # await save_user_data(user_data)
     await message.answer(text=text, reply_markup = keyboard)
     await state.set_state(UserState.reg_4)
 
@@ -153,14 +173,20 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
         user_data = await state.get_data()
         sheet_id = user_data.get('sheet_id')
         user_phone = user_data.get('phone')
-        func_id = user_data.get('func_id')
-        await write_to_google_sheet(sheet_id=sheet_id,
+        first_name=user_data.get('user_name')
+        last_name=user_data.get('user_last_name')
+        
+        update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                     user_id=callback_query.from_user.id,
                                     username=callback_query.from_user.username,
-                                    first_name=user_data.get('user_name'),
-                                    last_name=user_data.get('user_last_name'),
-                                    user_phone=user_phone
+                                    first_name=first_name,
+                                    last_name=last_name,
+                                    user_phone=user_phone,
+                                    status = "Начал обучение"
                                     )
+        chat_text = f"Новый партнер прошел регистрацию\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
+        chat_id = callback_query.message.chat.id
+        await chat_notification(chat_id, chat_text)
         await get_table_data(sheet_id, 1, state)
         user_data = await state.get_data()
         text = user_data.get('text_1')
@@ -183,7 +209,7 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
                 await callback_query.answer()
         else:
             await state.set_state(UserState.menu)
-            await menu(callback_query, state)
+            await end_course_handler(callback_query, state)
 
     elif callback_query.data == "change":
         await callback_query.message.answer("Введите ваше имя")
@@ -210,7 +236,7 @@ async def course_2(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
 
 async def course_3(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -233,7 +259,7 @@ async def course_3(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
 
 async def course_4(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -256,7 +282,7 @@ async def course_4(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
 
 async def course_5(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -279,7 +305,7 @@ async def course_5(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
 
 async def course_6(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -302,7 +328,7 @@ async def course_6(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
 
 async def course_7(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -325,7 +351,7 @@ async def course_7(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
 
 async def course_8(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -348,7 +374,7 @@ async def course_8(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
 
 
 async def course_9(callback_query: CallbackQuery, state: FSMContext):
@@ -372,7 +398,7 @@ async def course_9(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
 
 
 async def course_10(callback_query: CallbackQuery, state: FSMContext):
@@ -396,7 +422,24 @@ async def course_10(callback_query: CallbackQuery, state: FSMContext):
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
-        await menu(callback_query, state)
+        await end_course_handler(callback_query, state)
+
+async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    sheet_id = user_data.get('sheet_id')
+    update_status = await write_to_google_sheet(sheet_id=sheet_id,
+                                    user_id=callback_query.from_user.id,
+                                    username=callback_query.from_user.username,
+                                    status = "Закончил обучение"
+                                    )
+    user_phone = user_data.get('phone')
+    first_name=user_data.get('user_name')
+    last_name=user_data.get('user_last_name')
+    chat_id = callback_query.message.chat.id
+    chat_text = f"Партнер прошел обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
+    await chat_notification(chat_id, chat_text)
+    await state.set_state(UserState.menu)
+    await menu(callback_query, state)
 
 ###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###
 
@@ -428,31 +471,41 @@ async def send_client_3(message: Message, state: FSMContext):
 
 async def send_client_4(message: Message, state: FSMContext):
     lead_phone = message.text
-    user_data = await state.get_data()
-    client_name = user_data.get('lead_fio')
-    await state.update_data(lead_phone=lead_phone)
-    await state.set_state(UserState.send_client_4)
-    text = f"Проверьте данные перед отправкой менеджеру.   \n\nИмя клиента: {client_name} \nНомер телефона{lead_phone}"
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Подтвердить", callback_data="confurm"),
-             InlineKeyboardButton(text="Редактировать", callback_data="edit")]
-            ])
-    await message.answer(text = text, reply_markup = keyboard)
-
+    pattern = re.compile(r'^\+7\d{10}$')
+    match = re.fullmatch(pattern, lead_phone)
+    
+    if match:
+        user_data = await state.get_data()
+        client_name = user_data.get('lead_fio')
+        await state.update_data(lead_phone=lead_phone)
+        await state.set_state(UserState.send_client_4)
+        text = f"Проверьте данные перед отправкой менеджеру.   \n\nИмя клиента: {client_name} \nНомер телефона{lead_phone}"
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Подтвердить", callback_data="confurm"),
+                InlineKeyboardButton(text="Редактировать", callback_data="edit")]
+                ])
+        await message.answer(text = text, reply_markup = keyboard)
+    else:
+        await message.answer("Введите телефон в формате +7xxxxxxxxxx")
 #
 async def send_client_5(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     client_name = user_data.get('lead_fio')
     lead_phone = user_data.get('lead_phone')
     sheet_id = user_data.get('sheet_id')
+    ref_cash = user_data.get('cash_amount')
     await write_to_lead_google_sheet(
         sheet_id=sheet_id,
         first_name=client_name,
         ref_phone=lead_phone,
         user_id=callback_query.from_user.id,
-        username=callback_query.from_user.username
+        username=callback_query.from_user.username,
+        ref_cash=ref_cash
     )
-    text = f"Данные переданы менеджеру.   \n\nИмя клиента: {client_name} \nНомер телефона{lead_phone}   \n\nИнформацию о данном клиенте можно увидеть в разделе \"Узнать статус клиентов\""
+    chat_text = f"Новый клиент\n\n Имя: {client_name}\nНомер телефона: {lead_phone}"
+    chat_id = callback_query.message.chat.id
+    await chat_notification(chat_id, chat_text)
+    text = f"Данные переданы менеджеру.   \n\nИмя клиента: {client_name} \nНомер телефона: {lead_phone}   \n\nИнформацию о данном клиенте можно увидеть в разделе \"Узнать статус клиентов\""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
@@ -504,7 +557,7 @@ async def ref_link_1(callback_query: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
     await callback_query.message.answer(text = text)
-    await callback_query.message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_1", reply_markup = keyboard)
+    await callback_query.message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_2", reply_markup = keyboard)
 
 async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change)
@@ -515,15 +568,22 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     bank_name = user_data.get('bank_bank', "❌ не указан")
     bank_sbp = user_data.get('bank_sbp', "❌ не указан")
     bank_fio = user_data.get('bank_fio', "❌ не указан")
-    text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
-             InlineKeyboardButton(text="Банк", callback_data="bank")],
-             [InlineKeyboardButton(text="Телефон(СБП)", callback_data="sbp"),
-             InlineKeyboardButton(text="ФИО получателя", callback_data="fio")],
-             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
-            ])
-    await callback_query.message.answer(text = text, reply_markup = keyboard)
+    if card_number != "":
+        text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
+                InlineKeyboardButton(text="Банк", callback_data="bank")],
+                [InlineKeyboardButton(text="Телефон(СБП)", callback_data="sbp"),
+                InlineKeyboardButton(text="ФИО получателя", callback_data="fio")],
+                [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
+                ])
+        await callback_query.message.answer(text = text, reply_markup = keyboard)
+    else:
+        await callback_query.message.answer(text = text)
+        await full_bank_info_cb_1(callback_query, state)
+
+
+
 
 async def bank_info_1_message(message: Message, state: FSMContext):
     await state.set_state(UserState.bank_info_change)
@@ -534,15 +594,66 @@ async def bank_info_1_message(message: Message, state: FSMContext):
     bank_name = user_data.get('bank_bank', "❌ не указан")
     bank_sbp = user_data.get('bank_sbp', "❌ не указан")
     bank_fio = user_data.get('bank_fio', "❌ не указан")
-    text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
-             InlineKeyboardButton(text="Банк", callback_data="bank")],
-             [InlineKeyboardButton(text="Телефон(СБП)", callback_data="sbp"),
-             InlineKeyboardButton(text="ФИО получателя", callback_data="fio")],
-             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
-            ])
-    await message.answer(text = text, reply_markup = keyboard)
+    if card_number != "":
+        text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
+                InlineKeyboardButton(text="Банк", callback_data="bank")],
+                [InlineKeyboardButton(text="Телефон(СБП)", callback_data="sbp"),
+                InlineKeyboardButton(text="ФИО получателя", callback_data="fio")],
+                [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
+                ])
+        await message.answer(text = text, reply_markup = keyboard)
+    else:
+        await message.answer(text = text)
+        await full_bank_info_m_1(message, state)
+
+async def full_bank_info_cb_1(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('bank_1')
+    await callback_query.message.answer(text = text)
+
+async def full_bank_info_m_1(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('bank_1')
+    await callback_query.message.answer(text = text)
+
+async def full_bank_info_2(message: Message, state: FSMContext):
+    bank_card = message.text
+    
+    pattern = re.compile(r'^\d{16}$')
+    match = re.fullmatch(pattern, bank_card)
+    if match:
+        await state.update_data(bank_card=bank_card)
+        user_data = await state.get_data()
+        text = user_data.get('bank_2')
+        await message.answer(text = text)
+    else:
+        await message.answer("Введите номер карты в формате 16 цифр без пробелов")
+
+async def full_bank_info_3(message: Message, state: FSMContext):
+    bank_bank = message.text
+    await state.update_data(bank_bank=bank_bank)
+    user_data = await state.get_data()
+    text = user_data.get('bank_3')
+    await message.answer(text = text)
+
+async def full_bank_info_4(message: Message, state: FSMContext):
+    bank_sbp = message.text
+    pattern = re.compile(r'^\+7\d{10}$')
+    match = re.fullmatch(pattern, bank_sbp)
+    if match:
+        await state.update_data(bank_sbp=bank_sbp)
+        user_data = await state.get_data()
+        text = user_data.get('bank_4')
+        await message.answer(text = text)
+    else:
+        await message.answer("Введите номер телефона в фомате +7хххххххххх")
+
+async def full_bank_info_5(message: Message, state: FSMContext):
+    bank_fio = message.text
+    await state.update_data(bank_fio=bank_fio)
+    await bank_info_1_message(message, state)
 
 async def bank_info_change_card_number(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change_card_number)
@@ -573,13 +684,18 @@ async def bank_info_change_fio(callback_query: CallbackQuery, state: FSMContext)
 
 async def bank_info_change_card_number_2(message: Message, state: FSMContext):
     card_number = message.text
-    await state.update_data(bank_card = card_number)
-    user_data = await state.get_data()
-    sheet_id = user_data.get('sheet_id')
-    user_id = message.from_user.id
-    bank_info = "card"
-    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, card_number)
-    await bank_info_1_message(message, state)
+    pattern = re.compile(r'^\d{16}$')
+    match = re.fullmatch(pattern, card_number)
+    if match:
+        await state.update_data(bank_card = card_number)
+        user_data = await state.get_data()
+        sheet_id = user_data.get('sheet_id')
+        user_id = message.from_user.id
+        bank_info = "card"
+        await change_bank_info_google_sheet(sheet_id, user_id, bank_info, card_number)
+        await bank_info_1_message(message, state)
+    else:
+        await message.answer("Введите номер карты в формате 16 цифр без пробелов")
 
 async def bank_info_change_bank_2(message: Message, state: FSMContext):
     bank_name = message.text
@@ -593,14 +709,18 @@ async def bank_info_change_bank_2(message: Message, state: FSMContext):
 
 async def bank_info_change_sbp_2(message: Message, state: FSMContext):
     bank_sbp = message.text
-    await state.update_data(bank_sbp = bank_sbp)
-    user_data = await state.get_data()
-    sheet_id = user_data.get('sheet_id')
-    user_id = message.from_user.id
-    bank_info = "sbp"
-    await change_bank_info_google_sheet(sheet_id, user_id, bank_info, bank_sbp)
-    await bank_info_1_message(message, state)
-
+    pattern = re.compile(r'^\+7\d{10}$')
+    match = re.fullmatch(pattern, bank_sbp)
+    if match:
+        await state.update_data(bank_sbp = bank_sbp)
+        user_data = await state.get_data()
+        sheet_id = user_data.get('sheet_id')
+        user_id = message.from_user.id
+        bank_info = "sbp"
+        await change_bank_info_google_sheet(sheet_id, user_id, bank_info, bank_sbp)
+        await bank_info_1_message(message, state)
+    else:
+        await message.answer("Введите номер телефона в фомате +7хххххххххх")
 async def bank_info_change_fio_2(message: Message, state: FSMContext):
     bank_fio = message.text
     await state.update_data(bank_fio = bank_fio)
@@ -646,9 +766,20 @@ async def add_partner_2(callback_query: CallbackQuery, state: FSMContext):
     await callback_query.message.answer(text = text)
 
 async def add_partner_3(message: Message, state: FSMContext):
-    user_data = await state.get_data()
-    text = user_data.get('add_partner_3')
-    await message.answer(text = text)
+    lead_phone = message.text
+    pattern = re.compile(r'^\+7\d{10}$')
+    match = re.fullmatch(pattern, lead_phone)
+    if match:
+        user_data = await state.get_data()
+        text = user_data.get('add_partner_3')
+        text_2 = user_data.get('add_partner_4')
+        sheet_id = user_data.get('sheet_id')
+        user_id = message.from_user.id
+        await message.answer(text = text)
+        await message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_3")
+    else:
+        await message.answer("Введите телефон в формате +7xxxxxxxxxx")
+
 
 async def contact_us(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -656,3 +787,12 @@ async def contact_us(callback_query: CallbackQuery, state: FSMContext):
     await callback_query.message.answer(text = text)
 
 
+async def pd(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('pd')
+    await callback_query.message.answer(text = text)
+
+async def oferta(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('oferta')
+    await callback_query.message.answer(text = text)
