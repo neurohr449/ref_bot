@@ -454,12 +454,12 @@ async def course_10(callback_query: CallbackQuery, state: FSMContext):
         if match:            
             await callback_query.message.answer_video(video=video)
             await callback_query.message.answer(text=text, reply_markup = keyboard)
-            await state.set_state(UserState.menu)
+            await state.set_state(UserState.course_10)
             await callback_query.answer()
         else:
             
             await callback_query.message.answer(text=text, reply_markup = keyboard)
-            await state.set_state(UserState.menu)
+            await state.set_state(UserState.course_10)
             await callback_query.answer()
     else:
         await state.set_state(UserState.menu)
