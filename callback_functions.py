@@ -199,6 +199,7 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
                                     user_phone=user_phone,
                                     status = "Начал обучение"
                                     )
+        print(update_status)
         chat_text = f"Новый партнер прошел регистрацию и начал обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
         chat_id = user_data.get('notification_chat')
         await chat_notification(chat_id, chat_text)
@@ -447,6 +448,7 @@ async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
                                     username=callback_query.from_user.username,
                                     status = "Закончил обучение"
                                     )
+    print(update_status)
     user_phone = user_data.get('phone')
     first_name=user_data.get('user_name')
     last_name=user_data.get('user_last_name')
