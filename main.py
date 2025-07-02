@@ -128,6 +128,9 @@ async def course_9_cb_handler(callback_query: CallbackQuery, state: FSMContext) 
 async def course_10_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await course_10(callback_query, state)
 
+@router.callback_query(StateFilter(UserState.course_10))
+async def course_10_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await end_course_handler(callback_query, state)
 ######################################################################################################################################################################################################################################################
 #########
 @router.callback_query(lambda c: c.data == 'menu_1')

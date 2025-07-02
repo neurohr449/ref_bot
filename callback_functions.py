@@ -423,7 +423,7 @@ async def course_10(callback_query: CallbackQuery, state: FSMContext):
     text = user_data.get('text_10')
     video = user_data.get('video_10')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Перейти в меню", callback_data="menu")]
+            [InlineKeyboardButton(text="Перейти в меню", callback_data="next")]
             ])
     if text:
         match = re.search(TELEGRAM_VIDEO_PATTERN, video)
@@ -477,7 +477,7 @@ async def send_client_2(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.send_client_2)
     user_data = await state.get_data()
     text = user_data.get('send_client_2')
-    await callback_query.message.answer(text = text)
+    await callback_query.message.edit_text(text = text)
 
 async def send_client_3(message: Message, state: FSMContext):
     lead_fio = message.text
@@ -527,7 +527,7 @@ async def send_client_5(callback_query: CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
-    await callback_query.message.answer(text = text, reply_markup = keyboard)
+    await callback_query.message.edit_text(text = text, reply_markup = keyboard)
 #####################
 async def client_status_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.client_status_1)
@@ -539,7 +539,7 @@ async def client_status_1(callback_query: CallbackQuery, state: FSMContext):
              [InlineKeyboardButton(text="Выплачено", callback_data="payed"),
              InlineKeyboardButton(text="Отказано", callback_data="denied")]
             ])
-    await callback_query.message.answer(text = text, reply_markup = keyboard)
+    await callback_query.message.edit_text(text = text, reply_markup = keyboard)
 
 async def client_status_2(callback_query: CallbackQuery, state: FSMContext):
     status = callback_query.data
@@ -563,7 +563,7 @@ async def client_status_2(callback_query: CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
-    await callback_query.message.answer(text = text, reply_markup = keyboard)
+    await callback_query.message.edit_text(text = text, reply_markup = keyboard)
 
 async def ref_link_1(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -574,7 +574,7 @@ async def ref_link_1(callback_query: CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
-    await callback_query.message.answer(text = text)
+    await callback_query.message.edit_text(text = text)
     await callback_query.message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_2", reply_markup = keyboard)
 
 async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
@@ -582,11 +582,11 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     
     
     user_data = await state.get_data()
-    card_number = user_data.get('bank_card', "❌ не указан")
-    bank_name = user_data.get('bank_bank', "❌ не указан")
-    bank_sbp = user_data.get('bank_sbp', "❌ не указан")
-    bank_fio = user_data.get('bank_fio', "❌ не указан")
-    if card_number == "❌ не указан":
+    card_number = user_data.get('bank_card')
+    bank_name = user_data.get('bank_bank')
+    bank_sbp = user_data.get('bank_sbp')
+    bank_fio = user_data.get('bank_fio')
+    if card_number == None:
         text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
@@ -595,10 +595,10 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
                 InlineKeyboardButton(text="ФИО получателя", callback_data="fio")],
                 [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
                 ])
-        await callback_query.message.answer(text = text, reply_markup = keyboard)
+        await callback_query.message.edit_text(text = text, reply_markup = keyboard)
     else:
         text = user_data.get('empty_bank_info')
-        await callback_query.message.answer(text = text)
+        await callback_query.message.edit_text(text = text)
         await full_bank_info_cb_1(callback_query, state)
 
 
@@ -677,7 +677,7 @@ async def full_bank_info_4(message: Message, state: FSMContext):
         await message.answer("Введите номер телефона в фомате +7хххххххххх")
 
 async def full_bank_info_5(message: Message, state: FSMContext):
-    await state.set_state(UserState.bank_info_5)
+    
     bank_fio = message.text
     await state.update_data(bank_fio=bank_fio)
     user_data = await state.get_data()
@@ -688,28 +688,28 @@ async def bank_info_change_card_number(callback_query: CallbackQuery, state: FSM
     await state.set_state(UserState.bank_info_change_card_number)
     user_data = await state.get_data()
     text = user_data.get('bank_1')
-    await callback_query.message.answer(text = text)
+    await callback_query.message.edit_text(text = text)
 
 
 async def bank_info_change_bank(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change_bank)
     user_data = await state.get_data()
     text = user_data.get('bank_2')
-    await callback_query.message.answer(text = text)
+    await callback_query.message.edit_text(text = text)
 
 
 async def bank_info_change_sbp(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change_sbp)
     user_data = await state.get_data()
     text = user_data.get('bank_3')
-    await callback_query.message.answer(text = text)
+    await callback_query.message.edit_text(text = text)
 
 
 async def bank_info_change_fio(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change_fio)
     user_data = await state.get_data()
     text = user_data.get('bank_4')
-    await callback_query.message.answer(text = text)
+    await callback_query.message.edit_text(text = text)
 
 async def bank_info_change_card_number_2(message: Message, state: FSMContext):
     card_number = message.text
@@ -753,6 +753,7 @@ async def bank_info_change_sbp_2(message: Message, state: FSMContext):
         await bank_info_1_message(message, state)
     else:
         await message.answer("Введите номер телефона в фомате +7хххххххххх")
+
 async def bank_info_change_fio_2(message: Message, state: FSMContext):
     bank_fio = message.text
     await state.update_data(bank_fio = bank_fio)
@@ -770,7 +771,7 @@ async def chat_link(callback_query: CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])
-    await callback_query.message.answer(text = text, reply_markup = keyboard)
+    await callback_query.message.edit_text(text = text, reply_markup = keyboard)
 
 async def tos(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -778,7 +779,7 @@ async def tos(callback_query: CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])
-    await callback_query.message.answer(text = text, reply_markup = keyboard)
+    await callback_query.message.edit_text(text = text, reply_markup = keyboard)
 
 async def add_partner_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.add_partner_1)
@@ -788,7 +789,7 @@ async def add_partner_1(callback_query: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="🔜 Дальше", callback_data="next"),
              InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])
-    await callback_query.message.answer(text = text, reply_markup = keyboard)
+    await callback_query.message.edit_text(text = text, reply_markup = keyboard)
 
 
 async def add_partner_2(callback_query: CallbackQuery, state: FSMContext):
@@ -796,7 +797,7 @@ async def add_partner_2(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     text = user_data.get('add_partner_2')
     
-    await callback_query.message.answer(text = text)
+    await callback_query.message.edit_text(text = text)
 
 async def add_partner_3(message: Message, state: FSMContext):
     lead_phone = message.text
@@ -808,24 +809,36 @@ async def add_partner_3(message: Message, state: FSMContext):
         text_2 = user_data.get('add_partner_4')
         sheet_id = user_data.get('sheet_id')
         user_id = message.from_user.id
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+            ])
         await message.answer(text = text)
-        await message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_3")
+        await message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_3", reply_markup=keyboard)
     else:
         await message.answer("Введите телефон в формате +7xxxxxxxxxx")
 
 
 async def contact_us(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    text = user_data.get('tos')
-    await callback_query.message.answer(text = text)
+    text = "В разработке"
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+            ])
+    await callback_query.message.edit_text(text = text, reply_markup=keyboard)
 
 
 async def pd(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     text = user_data.get('pd')
-    await callback_query.message.answer(text = text)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+            ])
+    await callback_query.message.edit_text(text = text, reply_markup=keyboard)
 
 async def oferta(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     text = user_data.get('oferta')
-    await callback_query.message.answer(text = text)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+            ])
+    await callback_query.message.edit_text(text = text, reply_markup=keyboard)
