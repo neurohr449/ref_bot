@@ -17,7 +17,7 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 from functions import *
 from all_states import *
 from database import *
-from main import chat_notification
+from main import chat_notification, bot
 
 FAIL_KEYBOARD = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Попробовать снова", callback_data="retry")]
@@ -191,19 +191,34 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
         user_phone = user_data.get('phone')
         first_name=user_data.get('user_name')
         last_name=user_data.get('user_last_name')
-        
-        update_status = await write_to_google_sheet(sheet_id=sheet_id,
-                                    user_id=callback_query.from_user.id,
-                                    username=callback_query.from_user.username,
-                                    first_name=first_name,
-                                    last_name=last_name,
-                                    user_phone=user_phone,
-                                    status = "Начал обучение"
-                                    )
-        print(update_status)
-        chat_text = f"Новый партнер прошел регистрацию и начал обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
-        chat_id = user_data.get('notification_chat')
-        await chat_notification(chat_id, chat_text)
+        ref_id = user_data.get('ref_id')
+        ref_cash = user_data.get("cash_amount")
+        if ref_id == 1:
+            update_status = await write_to_google_sheet(sheet_id=sheet_id,
+                                        user_id=callback_query.from_user.id,
+                                        username=callback_query.from_user.username,
+                                        first_name=first_name,
+                                        last_name=last_name,
+                                        user_phone=user_phone,
+                                        status = "Начал обучение"
+                                        )
+            print(update_status)
+            chat_text = f"Новый партнер прошел регистрацию и начал обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
+            chat_id = user_data.get('notification_chat')
+            await chat_notification(chat_id, chat_text)
+        else:
+            username = await get_username_by_id(bot, ref_id)
+            update_status = await write_to_lead_google_sheet(sheet_id=sheet_id,
+                                                             first_name=first_name,
+                                                             ref_phone=user_phone,
+                                                             user_id=ref_id,
+                                                             username=username,
+                                                             ref_cash=ref_cash
+                                        )
+            print(update_status)
+            chat_text = f"Новый клиент прошел регистрацию и начал обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
+            chat_id = user_data.get('notification_chat')
+            await chat_notification(chat_id, chat_text)
         await get_table_data(sheet_id, 1, state)
         user_data = await state.get_data()
         text = user_data.get('text_1')
@@ -471,7 +486,7 @@ async def send_client_1(callback_query: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="Добавить", callback_data="next"),
              InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
-    await callback_query.message.answer(text = text, reply_markup = keyboard)
+    await callback_query.message.edit_text(text = text, reply_markup = keyboard)
 
 async def send_client_2(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.send_client_2)
@@ -586,7 +601,7 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     bank_name = user_data.get('bank_bank')
     bank_sbp = user_data.get('bank_sbp')
     bank_fio = user_data.get('bank_fio')
-    if card_number == None:
+    if card_number != None:
         text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
