@@ -200,7 +200,23 @@ async def bank_info_change_sbp_handler(message: Message, state: FSMContext) -> N
 async def bank_info_change_fio_handler(message: Message, state: FSMContext) -> None:
     await bank_info_change_fio_2(message, state)
 
+@router.message(StateFilter(UserState.bank_info_1))
+async def full_bank_info_1_handler(message: Message, state: FSMContext) -> None:
+    await full_bank_info_2(message, state)
 
+@router.message(StateFilter(UserState.bank_info_2))
+async def full_bank_info_2_handler(message: Message, state: FSMContext) -> None:
+    await full_bank_info_3(message, state)
+    
+@router.message(StateFilter(UserState.bank_info_3))
+async def full_bank_info_3_handler(message: Message, state: FSMContext) -> None:
+    await full_bank_info_4(message, state)
+@router.message(StateFilter(UserState.bank_info_4))
+async def full_bank_info_4_handler(message: Message, state: FSMContext) -> None:
+    await full_bank_info_5(message, state)
+    
+
+    
 ########
 @router.callback_query(lambda c: c.data == 'menu_5')
 async def chat_link_handler(callback_query: CallbackQuery, state: FSMContext) -> None:

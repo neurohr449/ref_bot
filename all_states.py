@@ -45,3 +45,8 @@ class UserState(StatesGroup):
     bank_info_change_bank = State()
     bank_info_change_sbp = State()
     bank_info_change_fio = State()
+    bank_info_1 = State()
+    bank_info_2 = State()
+    bank_info_3 = State()
+    bank_info_4 = State()
+    bank_info_5 = State()

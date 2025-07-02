@@ -34,6 +34,7 @@ async def menu_message(message: Message, state: FSMContext):
         await load_user_data_to_state(user_id, state)
         user_data = await state.get_data()
         sheet_id = user_data.get('sheet_id')
+        await get_table_data(sheet_id, 0, state)
     # user_name, bank_card, bank_bank, bank_sbp, bank_fio = await get_user_reg(sheet_id, user_id)
     # await state.update_data(user_name = user_name,
     #                         bank_card=bank_card,
@@ -627,21 +628,25 @@ async def bank_info_1_message(message: Message, state: FSMContext):
         await full_bank_info_m_1(message, state)
 
 async def full_bank_info_cb_1(callback_query: CallbackQuery, state: FSMContext):
+    await state.set_state(UserState.bank_info_1)
     user_data = await state.get_data()
     text = user_data.get('bank_1')
     await callback_query.message.answer(text = text)
 
 async def full_bank_info_m_1(callback_query: CallbackQuery, state: FSMContext):
+    await state.set_state(UserState.bank_info_1)
     user_data = await state.get_data()
     text = user_data.get('bank_1')
     await callback_query.message.answer(text = text)
 
 async def full_bank_info_2(message: Message, state: FSMContext):
-    bank_card = message.text
     
+    bank_card = message.text
+    await state.set_state(UserState.bank_info_change_card_number)
     pattern = re.compile(r'^\d{16}$')
     match = re.fullmatch(pattern, bank_card)
     if match:
+        await state.set_state(UserState.bank_info_2)
         await state.update_data(bank_card=bank_card)
         user_data = await state.get_data()
         text = user_data.get('bank_2')
@@ -650,6 +655,7 @@ async def full_bank_info_2(message: Message, state: FSMContext):
         await message.answer("Введите номер карты в формате 16 цифр без пробелов")
 
 async def full_bank_info_3(message: Message, state: FSMContext):
+    await state.set_state(UserState.bank_info_3)
     bank_bank = message.text
     await state.update_data(bank_bank=bank_bank)
     user_data = await state.get_data()
@@ -662,6 +668,7 @@ async def full_bank_info_4(message: Message, state: FSMContext):
     pattern = re.compile(r'^\+7\d{10}$')
     match = re.fullmatch(pattern, bank_sbp)
     if match:
+        await state.set_state(UserState.bank_info_4)
         await state.update_data(bank_sbp=bank_sbp)
         user_data = await state.get_data()
         text = user_data.get('bank_4')
@@ -670,6 +677,7 @@ async def full_bank_info_4(message: Message, state: FSMContext):
         await message.answer("Введите номер телефона в фомате +7хххххххххх")
 
 async def full_bank_info_5(message: Message, state: FSMContext):
+    await state.set_state(UserState.bank_info_5)
     bank_fio = message.text
     await state.update_data(bank_fio=bank_fio)
     user_data = await state.get_data()
