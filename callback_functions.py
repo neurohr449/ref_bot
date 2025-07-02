@@ -639,7 +639,7 @@ async def bank_info_1_message(message: Message, state: FSMContext):
     bank_name = user_data.get('bank_bank', "❌ не указан")
     bank_sbp = user_data.get('bank_sbp', "❌ не указан")
     bank_fio = user_data.get('bank_fio', "❌ не указан")
-    if card_number == "❌ не указан":
+    if card_number != None:
         text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
@@ -707,7 +707,20 @@ async def full_bank_info_5(message: Message, state: FSMContext):
     bank_fio = message.text
     await state.update_data(bank_fio=bank_fio)
     user_data = await state.get_data()
+    sheet_id = user_data.get('sheet_id')
+    user_id = message.from_user.id
+    bank_info_card_number=user_data.get('bank_card')
+    bank_info_bank=user_data.get('bank_bank')
+    bank_info_sbp=user_data.get('bank_sbp')
+    bank_info_fio=user_data.get('bank_fio')
     await save_user_data(user_data)
+    update_status = await write_to_google_sheet(sheet_id=sheet_id,
+                                                user_id=user_id,
+                                                bank_info_card_number=bank_info_card_number,
+                                                bank_info_bank=bank_info_bank,
+                                                bank_info_sbp=bank_info_sbp,
+                                                bank_info_fio=bank_info_fio)
+    print(update_status)
     await bank_info_1_message(message, state)
 
 async def bank_info_change_card_number(callback_query: CallbackQuery, state: FSMContext):
