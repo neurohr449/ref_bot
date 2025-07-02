@@ -187,45 +187,44 @@ async def write_to_google_sheet(
                     break
         
        
-        update_data = {}
-        
-        if not user_row:
-            update_data = {
-                'id Партнера': user_id,
-                'ТГ Ник': f"@{username}",
-                'Ссылка на партнера': f"https://t.me/{username}",
-                'Имя': first_name,
-                'Фамилия': last_name,
-                'Номер телефона': user_phone,
-                'Инормация для выплат Номер карты': bank_info_card_number or "",
-                'Инормация для выплат Банк': bank_info_bank or "",
-                'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
-                'Инормация для выплат Имя получателя': bank_info_fio or "",
-                'Статус': status
-            }
+        update_data = {
+            'id Партнера': user_id,
+            'ТГ Ник': f"@{username}",
+            'Ссылка на партнера': f"https://t.me/{username}",
+            'Имя': first_name or "",
+            'Фамилия': last_name or "",
+            'Номер телефона': user_phone or "",
+            'Инормация для выплат Номер карты': bank_info_card_number or "",
+            'Инормация для выплат Банк': bank_info_bank or "",
+            'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
+            'Инормация для выплат Имя получателя': bank_info_fio or "",
+            'Статус': status or ""
+        }
+       
         
 
         if user_row:
             current_values = data[user_row-2]
 
-            for key in update_data:
-                current_values[key] = update_data[key]
+            for key, value in update_data.items():
+                if value is not None and value != "":
+                    current_values[key] = value
             
             row_values = [
-                current_values.get('id Партнера', ''),                              # A
-                current_values.get('ТГ Ник', ''),                                   # B
-                current_values.get('Ссылка на партнера', ''),                       # C
-                current_values.get('Имя', ''),                                      # D
-                current_values.get('Фамилия', ''),                                  # E
-                current_values.get('Номер телефона', ''),                           # F
-                current_values.get('Инормация для выплат Номер карты', ''),         # G                                       
-                current_values.get('Инормация для выплат Банк', ''),                # H
-                current_values.get('Инормация для выплат Номер телефона СБП', ''),  # I
-                current_values.get('Инормация для выплат Имя получателя', ''),      # J  
-                current_values.get('Статус', '')                                    # K
+                current_values.get('id Партнера', ''),
+                current_values.get('ТГ Ник', ''),
+                current_values.get('Ссылка на партнера', ''),
+                current_values.get('Имя', ''),
+                current_values.get('Фамилия', ''),
+                current_values.get('Номер телефона', ''),
+                current_values.get('Инормация для выплат Номер карты', ''),
+                current_values.get('Инормация для выплат Банк', ''),
+                current_values.get('Инормация для выплат Номер телефона СБП', ''),
+                current_values.get('Инормация для выплат Имя получателя', ''),
+                current_values.get('Статус', '')
             ]
             
-            await asyncio.to_thread(sheet.update, f'A{user_row}:S{user_row}', [row_values])
+            await asyncio.to_thread(sheet.update, f'A{user_row}:K{user_row}', [row_values])
         else:
             
             new_row = [
