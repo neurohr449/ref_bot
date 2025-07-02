@@ -67,7 +67,7 @@ async def save_user_data(state_data: dict):
                     state_data.get("bank_sbp"),
                     state_data.get("bank_fio"),
                     state_data.get("sheet_id"),
-                    state_data.get("sheet_range")
+                    state_data.get("func_id")
                 ))
                 conn.commit()
                 print("Данные успешно сохранены в БД!")
@@ -108,7 +108,7 @@ async def load_user_data_to_state(tg_id: int, state: FSMContext):
                         "bank_sbp": result[5],
                         "bank_fio": result[6],
                         "sheet_id": result[7],
-                        "sheet_range": result[8]
+                        "func_id": result[8]
                     }
                     
                     # Очищаем текущее состояние и заполняем данными из БД

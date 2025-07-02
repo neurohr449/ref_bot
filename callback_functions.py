@@ -583,7 +583,7 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     bank_name = user_data.get('bank_bank', "❌ не указан")
     bank_sbp = user_data.get('bank_sbp', "❌ не указан")
     bank_fio = user_data.get('bank_fio', "❌ не указан")
-    if card_number != "":
+    if card_number == "❌ не указан":
         text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
@@ -610,7 +610,7 @@ async def bank_info_1_message(message: Message, state: FSMContext):
     bank_name = user_data.get('bank_bank', "❌ не указан")
     bank_sbp = user_data.get('bank_sbp', "❌ не указан")
     bank_fio = user_data.get('bank_fio', "❌ не указан")
-    if card_number != "":
+    if card_number == "❌ не указан":
         text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Номер карты", callback_data="card_number"),
@@ -651,6 +651,7 @@ async def full_bank_info_3(message: Message, state: FSMContext):
     bank_bank = message.text
     await state.update_data(bank_bank=bank_bank)
     user_data = await state.get_data()
+    
     text = user_data.get('bank_3')
     await message.answer(text = text)
 
@@ -711,6 +712,7 @@ async def bank_info_change_card_number_2(message: Message, state: FSMContext):
         user_id = message.from_user.id
         bank_info = "card"
         await change_bank_info_google_sheet(sheet_id, user_id, bank_info, card_number)
+        await save_user_data(user_data)
         await bank_info_1_message(message, state)
     else:
         await message.answer("Введите номер карты в формате 16 цифр без пробелов")
@@ -723,6 +725,7 @@ async def bank_info_change_bank_2(message: Message, state: FSMContext):
     user_id = message.from_user.id
     bank_info = "bank"
     await change_bank_info_google_sheet(sheet_id, user_id, bank_info, bank_name)
+    await save_user_data(user_data)
     await bank_info_1_message(message, state)
 
 async def bank_info_change_sbp_2(message: Message, state: FSMContext):
@@ -736,6 +739,7 @@ async def bank_info_change_sbp_2(message: Message, state: FSMContext):
         user_id = message.from_user.id
         bank_info = "sbp"
         await change_bank_info_google_sheet(sheet_id, user_id, bank_info, bank_sbp)
+        await save_user_data(user_data)
         await bank_info_1_message(message, state)
     else:
         await message.answer("Введите номер телефона в фомате +7хххххххххх")
@@ -747,6 +751,7 @@ async def bank_info_change_fio_2(message: Message, state: FSMContext):
     user_id = message.from_user.id
     bank_info = "fio"
     await change_bank_info_google_sheet(sheet_id, user_id, bank_info, bank_fio)
+    await save_user_data(user_data)
     await bank_info_1_message(message, state)
 
 async def chat_link(callback_query: CallbackQuery, state: FSMContext):

@@ -43,6 +43,10 @@ class StateMiddleware(BaseMiddleware):
 async def menu_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await menu(callback_query, state)
 
+@router.message(Command("menu"))
+async def command_menu(message: Message, state: FSMContext):
+    await menu_message(message, state)
+
 
 @router.message(CommandStart())
 async def command_start_handler(message: Message, command: CommandObject, state: FSMContext) -> None:
