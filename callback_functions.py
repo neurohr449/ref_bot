@@ -93,7 +93,7 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
                   ],
         
     )
-    await callback_query.message.answer(text=text,reply_markup=keyboard)
+    await callback_query.message.edit_text(text=text,reply_markup=keyboard)
 
 
 async def main_menu_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
