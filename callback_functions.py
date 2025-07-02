@@ -30,12 +30,16 @@ async def menu_message(message: Message, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
-    user_name, bank_card, bank_bank, bank_sbp, bank_fio = await get_user_reg(sheet_id, user_id)
-    await state.update_data(user_name = user_name,
-                            bank_card=bank_card,
-                            bank_bank = bank_bank,
-                            bank_sbp = bank_sbp,
-                            bank_fio = bank_fio)
+    if sheet_id is None:
+        await load_user_data_to_state(user_id, state)
+        user_data = await state.get_data()
+        sheet_id = user_data.get('sheet_id')
+    # user_name, bank_card, bank_bank, bank_sbp, bank_fio = await get_user_reg(sheet_id, user_id)
+    # await state.update_data(user_name = user_name,
+    #                         bank_card=bank_card,
+    #                         bank_bank = bank_bank,
+    #                         bank_sbp = bank_sbp,
+    #                         bank_fio = bank_fio)
     user_data = await state.get_data()
     name = user_data.get('user_name')
     text = f"🏠 Главное меню 🎉 {name}, рады видеть вас снова! Выберите необходимый раздел для работы с вашими рекомендациями."
@@ -60,12 +64,17 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = callback_query.from_user.id
-    user_name, bank_card, bank_bank, bank_sbp, bank_fio = await get_user_reg(sheet_id, user_id)
-    await state.update_data(user_name = user_name,
-                            bank_card=bank_card,
-                            bank_bank = bank_bank,
-                            bank_sbp = bank_sbp,
-                            bank_fio = bank_fio)
+    if sheet_id is None:
+        await load_user_data_to_state(user_id, state)
+        user_data = await state.get_data()
+        sheet_id = user_data.get('sheet_id')
+        await get_table_data(sheet_id, 0, state)
+    # user_name, bank_card, bank_bank, bank_sbp, bank_fio = await get_user_reg(sheet_id, user_id)
+    # await state.update_data(user_name = user_name,
+    #                         bank_card=bank_card,
+    #                         bank_bank = bank_bank,
+    #                         bank_sbp = bank_sbp,
+    #                         bank_fio = bank_fio)
     user_data = await state.get_data()
     name = user_data.get('user_name')
     text = f"🏠 Главное меню 🎉 {name}, рады видеть вас снова! Выберите необходимый раздел для работы с вашими рекомендациями."
@@ -164,7 +173,8 @@ async def reg_4(message: Message, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Далее", callback_data="next"),InlineKeyboardButton(text="Изменить", callback_data="change")]
     ])
-    # await save_user_data(user_data)
+    user_data = await state.get_data()
+    await save_user_data(user_data)
     await message.answer(text=text, reply_markup = keyboard)
     await state.set_state(UserState.reg_4)
 
@@ -657,6 +667,8 @@ async def full_bank_info_4(message: Message, state: FSMContext):
 async def full_bank_info_5(message: Message, state: FSMContext):
     bank_fio = message.text
     await state.update_data(bank_fio=bank_fio)
+    user_data = await state.get_data()
+    await save_user_data(user_data)
     await bank_info_1_message(message, state)
 
 async def bank_info_change_card_number(callback_query: CallbackQuery, state: FSMContext):
