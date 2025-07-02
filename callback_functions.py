@@ -135,6 +135,8 @@ async def reg_2(message: Message, state: FSMContext):
         phone_number = message.contact.phone_number
     elif message.text:
         phone_number = message.text
+    if not phone_number.startswith("+"):
+        phone_number = f"+{phone_number.lstrip('+')}"
     pattern = re.compile(r'^\+7\d{10}$')
     match = re.fullmatch(pattern, phone_number)
     
@@ -193,7 +195,7 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
         last_name=user_data.get('user_last_name')
         ref_id = user_data.get('ref_id')
         ref_cash = user_data.get("cash_amount")
-        if ref_id == 1:
+        if ref_id == "1":
             update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                         user_id=callback_query.from_user.id,
                                         username=callback_query.from_user.username,
