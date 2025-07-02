@@ -199,7 +199,7 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
                                     user_phone=user_phone,
                                     status = "Начал обучение"
                                     )
-        chat_text = f"Новый партнер прошел регистрацию\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
+        chat_text = f"Новый партнер прошел регистрацию и начал обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
         chat_id = user_data.get('notification_chat')
         await chat_notification(chat_id, chat_text)
         await get_table_data(sheet_id, 1, state)
