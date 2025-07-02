@@ -650,6 +650,7 @@ async def bank_info_1_message(message: Message, state: FSMContext):
                 ])
         await message.answer(text = text, reply_markup = keyboard)
     else:
+        text = user_data.get('empty_bank_info')
         await message.answer(text = text)
         await full_bank_info_m_1(message, state)
 
