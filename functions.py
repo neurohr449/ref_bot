@@ -3,7 +3,7 @@ import gspread
 import asyncio
 from google.oauth2.service_account import Credentials
 from aiogram.fsm.context import FSMContext
-
+from aiogram import Bot
 
 
 async def get_google_sheet_data(sheet_id, range_name, worksheet):
@@ -354,3 +354,14 @@ async def change_bank_info_google_sheet(
     except Exception as e:
         print(f"Ошибка записи в Google Sheets: {e}")
         return False
+    
+
+
+async def get_username_by_id(bot: Bot, user_id: int) -> str | None:
+    try:
+        user = await bot.get_chat(user_id)
+        return user.username
+    except Exception as e:
+        print(f"Ошибка при получении username: {e}")
+        return None
+
