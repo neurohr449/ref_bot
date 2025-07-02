@@ -103,6 +103,8 @@ async def main_menu_handler(callback_query: CallbackQuery, state: FSMContext) ->
 async def reg_1(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
+    user_id=callback_query.from_user.id
+    await state.update_data(tg_id = user_id)
     await get_table_data(sheet_id, 0, state)
     user_data = await state.get_data()
     update_status = await write_to_google_sheet(sheet_id=sheet_id,

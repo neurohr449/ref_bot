@@ -59,12 +59,12 @@ async def save_user_data(state_data: dict):
                 
                 cursor.execute(query, (
                     state_data.get("tg_id"),          
-                    state_data.get("first_name"),
-                    state_data.get("last_name"),
-                    state_data.get("phone_number"),
-                    state_data.get("card_number"),
-                    state_data.get("bank_info"),
-                    state_data.get("sbp_info"),
+                    state_data.get("user_name"),
+                    state_data.get("user_last_name"),
+                    state_data.get("phone"),
+                    state_data.get("bank_card"),
+                    state_data.get("bank_bank"),
+                    state_data.get("bank_sbp"),
                     state_data.get("bank_fio"),
                     state_data.get("sheet_id"),
                     state_data.get("sheet_range")
@@ -100,12 +100,12 @@ async def load_user_data_to_state(tg_id: int, state: FSMContext):
                 if result:
                     # Сопоставляем поля результата с ключами state
                     user_data = {
-                        "first_name": result[0],
-                        "last_name": result[1],
-                        "phone_number": result[2],
-                        "card_number": result[3],
-                        "bank_info": result[4],
-                        "sbp_info": result[5],
+                        "user_name": result[0],
+                        "user_last_name": result[1],
+                        "phone": result[2],
+                        "bank_card": result[3],
+                        "bank_bank": result[4],
+                        "bank_sbp": result[5],
                         "bank_fio": result[6],
                         "sheet_id": result[7],
                         "sheet_range": result[8]
