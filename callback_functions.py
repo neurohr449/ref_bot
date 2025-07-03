@@ -896,14 +896,16 @@ async def contact_us_4(callback_query: CallbackQuery, state: FSMContext):
     if callback_query.data == "next":
         user_data = await state.get_data()
         text_to_send = user_data.get('text_to_send')
+        
         user_id = callback_query.from_user.id
         user_name = callback_query.from_user.username
         first_name = user_data.get('user_name')
         user_phone = user_data.get('phone')
         sheet_id = user_data.get('sheet_id')
         chat_id = user_data.get('notification_chat')
+        text_to_chat = f"Новый запрос на связь с менеджером от пользователя:\n id Пользователя: {user_id} \nИмя: {first_name}\nСсылка на чат: https://t.me/{user_name} \n\nТекст сообщения: \n{text_to_send}"
         update_status = await write_to_contact_google_sheet(sheet_id, user_id, user_name,first_name,user_phone,text_to_send)
-        await chat_notification(chat_id, text_to_send)
+        await chat_notification(chat_id, text_to_chat)
         text = f"Информация передана менеджеру"
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
