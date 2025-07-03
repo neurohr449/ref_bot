@@ -901,7 +901,7 @@ async def contact_us_4(callback_query: CallbackQuery, state: FSMContext):
         first_name = user_data.get('user_name')
         user_phone = user_data.get('phone')
         sheet_id = user_data.get('sheet_id')
-        chat_id = callback_query.message.chat.id
+        chat_id = user_data.get('notification_chat')
         update_status = await write_to_contact_google_sheet(sheet_id, user_id, user_name,first_name,user_phone,text_to_send)
         await chat_notification(chat_id, text_to_send)
         text = f"Информация передана менеджеру"
