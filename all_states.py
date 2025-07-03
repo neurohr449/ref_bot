@@ -50,3 +50,6 @@ class UserState(StatesGroup):
     bank_info_3 = State()
     bank_info_4 = State()
     bank_info_5 = State()
+    contuct_us_1 = State()
+    contuct_us_2 = State()
+    contuct_us_3 = State()

@@ -253,6 +253,18 @@ async def add_partner_3_handler(message: Message, state: FSMContext) -> None:
 async def contact_us_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await contact_us(callback_query, state)
 
+@router.callback_query(StateFilter(UserState.contuct_us_1))
+async def contact_us_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await contact_us_2(callback_query, state)
+
+@router.message(StateFilter(UserState.contuct_us_2))
+async def contact_us_2_handler(message: Message, state: FSMContext) -> None:
+    await contact_us_3(message, state)
+
+@router.callback_query(StateFilter(UserState.contuct_us_3))
+async def contact_us_3_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await contact_us_4(callback_query, state)
+
 @router.callback_query(lambda c: c.data == 'menu_9')
 async def pd_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await pd(callback_query, state)

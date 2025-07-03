@@ -93,8 +93,10 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
             add_partner_3=row_data[21],
             add_partner_4=row_data[22],
             add_partner_5=row_data[23],
-            pd=row_data[24],
-            oferta=row_data[25]
+            contuct_us_1 = row_data[24],
+            contuct_us_2 = row_data[25],
+            pd=row_data[26],
+            oferta=row_data[27]
             )
     elif worksheet == 1:
         user_data = await state.get_data()
@@ -365,3 +367,80 @@ async def get_username_by_id(bot: Bot, user_id: int) -> str | None:
         print(f"Ошибка при получении username: {e}")
         return None
 
+async def write_to_contact_google_sheet(
+    sheet_id: str,
+    user_id: str,
+    username: str,
+    first_name: str,
+    user_phone: str,
+    text_to_send: str
+) -> bool:
+
+    try:
+        
+
+        sheet = await get_google_sheet(sheet_id, 4)
+        
+        
+                   
+        # user_row = None
+        # for i, row in enumerate(data, start=2):
+        #         if str(user_id) == str(row.get('id Партнера', '')):
+        #             user_row = i
+        #             break
+        
+       
+        # update_data = {
+        #     'id Партнера': user_id,
+        #     'ТГ Ник': f"@{username}",
+        #     'Ссылка на партнера': f"https://t.me/{username}",
+        #     'Имя': first_name or "",
+        #     'Фамилия': last_name or "",
+        #     'Номер телефона': user_phone or "",
+        #     'Инормация для выплат Номер карты': bank_info_card_number or "",
+        #     'Инормация для выплат Банк': bank_info_bank or "",
+        #     'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
+        #     'Инормация для выплат Имя получателя': bank_info_fio or "",
+        #     'Статус': status or ""
+        # }
+       
+        
+
+        # if user_row:
+        #     current_values = data[user_row-2]
+
+        #     for key, value in update_data.items():
+        #         if value is not None and value != "":
+        #             current_values[key] = value
+            
+        #     row_values = [
+        #         current_values.get('id Партнера', ''),
+        #         current_values.get('ТГ Ник', ''),
+        #         current_values.get('Ссылка на партнера', ''),
+        #         current_values.get('Имя', ''),
+        #         current_values.get('Фамилия', ''),
+        #         current_values.get('Номер телефона', ''),
+        #         current_values.get('Инормация для выплат Номер карты', ''),
+        #         current_values.get('Инормация для выплат Банк', ''),
+        #         current_values.get('Инормация для выплат Номер телефона СБП', ''),
+        #         current_values.get('Инормация для выплат Имя получателя', ''),
+        #         current_values.get('Статус', '')
+        #     ]
+            
+        #     await asyncio.to_thread(sheet.update, f'A{user_row}:K{user_row}', [row_values])
+        # else:
+            
+        new_row = [
+            user_id,                                   
+            first_name,
+            user_phone,
+            f"https://t.me/{username}",                 
+            text_to_send,                         
+            ]
+        
+        await asyncio.to_thread(sheet.append_row, new_row)
+        
+        return True
+    except Exception as e:
+        print(f"Ошибка записи в Google Sheets: {e}")
+        return False

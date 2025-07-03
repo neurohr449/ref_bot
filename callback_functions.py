@@ -196,6 +196,8 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
         ref_id = user_data.get('ref_id')
         ref_cash = user_data.get("cash_amount")
         if ref_id == "1":
+            if not user_phone.startswith("+"):
+                user_phone = f"+{user_phone.lstrip('+')}"
             update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                         user_id=callback_query.from_user.id,
                                         username=callback_query.from_user.username,
@@ -860,12 +862,55 @@ async def add_partner_3(message: Message, state: FSMContext):
 
 async def contact_us(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    text = "В разработке"
+    await state.set_state(UserState.contuct_us_1)
+    text = user_data.get('contuct_us_1')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Отправить сообщение", callback_data="next"), 
+             InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+            ])
+    await callback_query.message.edit_text(text = text, reply_markup=keyboard)
+
+async def contact_us_2(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    await state.set_state(UserState.contuct_us_2)
+    text = user_data.get('contuct_us_2')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])
     await callback_query.message.edit_text(text = text, reply_markup=keyboard)
 
+async def contact_us_3(message: Message, state: FSMContext):
+    
+    await state.set_state(UserState.contuct_us_3)
+    text_to_send = message.text
+    await state.update_data(text_to_send=text_to_send)
+    text = f"Текст для отправки менеджеру: \n\"{text_to_send}\""
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Отправить сообщение", callback_data="next"),
+             InlineKeyboardButton(text="Изменить", callback_data="change"),
+             InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+            ])
+    await message.answer(text = text, reply_markup=keyboard)
+
+async def contact_us_4(callback_query: CallbackQuery, state: FSMContext):
+    if callback_query.data == "next":
+        user_data = state.get_data()
+        text_to_send = user_data.get('text_to_send')
+        user_id = callback_query.from_user.id
+        user_name = callback_query.from_user.username
+        first_name = user_data.get('user_name')
+        user_phone = user_data.get('phone')
+        sheet_id = user_data.get('sheet_id')
+        chat_id = callback_query.message.chat.id
+        update_status = await write_to_contact_google_sheet(sheet_id, user_id, user_name,first_name,user_phone,text_to_send)
+        await chat_notification(chat_id, text_to_send)
+        text = f"Информация передана менеджеру"
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
+                ])
+        await callback_query.message.edit_text(text = text, reply_markup=keyboard)
+    if callback_query.data == "change":
+        await contact_us_2(callback_query, state)
 
 async def pd(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
