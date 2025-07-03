@@ -894,7 +894,7 @@ async def contact_us_3(message: Message, state: FSMContext):
 
 async def contact_us_4(callback_query: CallbackQuery, state: FSMContext):
     if callback_query.data == "next":
-        user_data = state.get_data()
+        user_data = await state.get_data()
         text_to_send = user_data.get('text_to_send')
         user_id = callback_query.from_user.id
         user_name = callback_query.from_user.username
