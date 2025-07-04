@@ -540,7 +540,7 @@ async def send_client_5(callback_query: CallbackQuery, state: FSMContext):
     lead_phone = user_data.get('lead_phone')
     sheet_id = user_data.get('sheet_id')
     ref_cash = user_data.get('cash_amount')
-    await write_to_lead_google_sheet(
+    update_status = await write_to_lead_google_sheet(
         sheet_id=sheet_id,
         first_name=client_name,
         ref_phone=lead_phone,
@@ -548,14 +548,22 @@ async def send_client_5(callback_query: CallbackQuery, state: FSMContext):
         username=callback_query.from_user.username,
         ref_cash=ref_cash
     )
-    chat_text = f"Новый клиент\n\n Имя: {client_name}\nНомер телефона: {lead_phone}"
-    chat_id = user_data.get('notification_chat')
-    await chat_notification(chat_id, chat_text)
-    text = f"Данные переданы менеджеру.   \n\nИмя клиента: {client_name} \nНомер телефона: {lead_phone}   \n\nИнформацию о данном клиенте можно увидеть в разделе \"Узнать статус клиентов\""
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
-            ])
-    await callback_query.message.edit_text(text = text, reply_markup = keyboard)
+    if update_status == True:
+        chat_text = f"Новый клиент\n\n Имя: {client_name}\nНомер телефона: {lead_phone}"
+        chat_id = user_data.get('notification_chat')
+        await chat_notification(chat_id, chat_text)
+        text = f"Данные переданы менеджеру.   \n\nИмя клиента: {client_name} \nНомер телефона: {lead_phone}   \n\nИнформацию о данном клиенте можно увидеть в разделе \"Узнать статус клиентов\""
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
+                ])
+        await callback_query.message.edit_text(text = text, reply_markup = keyboard)
+    else:
+        text = "Данный номер уже зарагестрирован в нашей базе"
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
+                ])
+        await callback_query.message.edit_text(text = text, reply_markup = keyboard)
+
 #####################
 async def client_status_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.client_status_1)
@@ -758,11 +766,14 @@ async def bank_info_change_card_number_2(message: Message, state: FSMContext):
     pattern = re.compile(r'^\d{16}$')
     match = re.fullmatch(pattern, card_number)
     if match:
-        await state.update_data(bank_card = card_number)
+        tg_id = message.from_user.id
+        await state.update_data(bank_card = card_number,
+                                tg_id=tg_id)
         user_data = await state.get_data()
         sheet_id = user_data.get('sheet_id')
         user_id = message.from_user.id
         bank_info = "card"
+
         await change_bank_info_google_sheet(sheet_id, user_id, bank_info, card_number)
         await save_user_data(user_data)
         await bank_info_1_message(message, state)
@@ -771,7 +782,9 @@ async def bank_info_change_card_number_2(message: Message, state: FSMContext):
 
 async def bank_info_change_bank_2(message: Message, state: FSMContext):
     bank_name = message.text
-    await state.update_data(bank_bank = bank_name)
+    tg_id = message.from_user.id
+    await state.update_data(bank_bank = bank_name,
+                            tg_id = tg_id)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
@@ -782,10 +795,13 @@ async def bank_info_change_bank_2(message: Message, state: FSMContext):
 
 async def bank_info_change_sbp_2(message: Message, state: FSMContext):
     bank_sbp = message.text
+    tg_id = message.from_user.id
+
     pattern = re.compile(r'^\+7\d{10}$')
     match = re.fullmatch(pattern, bank_sbp)
     if match:
-        await state.update_data(bank_sbp = bank_sbp)
+        await state.update_data(bank_sbp = bank_sbp,
+                                tg_id=tg_id)
         user_data = await state.get_data()
         sheet_id = user_data.get('sheet_id')
         user_id = message.from_user.id
@@ -798,7 +814,9 @@ async def bank_info_change_sbp_2(message: Message, state: FSMContext):
 
 async def bank_info_change_fio_2(message: Message, state: FSMContext):
     bank_fio = message.text
-    await state.update_data(bank_fio = bank_fio)
+    tg_id = message.from_user.id
+    await state.update_data(bank_fio = bank_fio,
+                            tg_id = tg_id)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id

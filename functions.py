@@ -136,7 +136,9 @@ async def check_user_reg(sheet_id, user_id, phone_number):
     
     if not data or not isinstance(data, list):
         return False
-    
+    if not phone_number.startswith("+"):
+                phone_number = f"+{phone_number.lstrip('+')}"
+
     for row in data:  
         if str(user_id) == str(row.get('id Партнера', '')) and str(phone_number) == str(row.get('Номер телефона', '')):
             return True
@@ -180,7 +182,8 @@ async def write_to_google_sheet(
 
         sheet = await get_google_sheet(sheet_id, 2)
         data = await asyncio.to_thread(sheet.get_all_records)
-        
+        if not user_phone.startswith("+"):
+                user_phone = f"+{user_phone.lstrip('+')}"
                    
         user_row = None
         for i, row in enumerate(data, start=2):
@@ -266,7 +269,7 @@ async def write_to_lead_google_sheet(
         
         for row in data:
             if str(ref_phone) == str(row.get('Номер телефона', '')):
-                return 
+                return False
 
         ref_id = ref_phone
 
@@ -303,13 +306,14 @@ async def read_lead_google_sheet(
         data = await asyncio.to_thread(sheet.get_all_records)
         print (data)
         ref_status = []
-        for row in data:  
-            if str(user_id) == str(row.get('id Партнера', '')) and lead_status == str(row.get('Статус', '')):
-                ref_name = str(row.get('Имя', ''))
-                ref_phone = str(row.get('Номер телефона', ''))
-                ref_cash = str(row.get('Запланированная выплата', ''))
-                ref_status.append(f"Имя реферала:{ref_name} \nНомер телефона:{ref_phone} \nЗапланированная выплата: {ref_cash}\n\n")
-                
+        for row, i in data:  
+            if i >= 10:
+                if str(user_id) == str(row.get('id Партнера', '')) and lead_status == str(row.get('Статус', '')):
+                    ref_name = str(row.get('Имя', ''))
+                    ref_phone = str(row.get('Номер телефона', ''))
+                    ref_cash = str(row.get('Запланированная выплата', ''))
+                    ref_status.append(f"Имя реферала:{ref_name} \nНомер телефона:{ref_phone} \nЗапланированная выплата: {ref_cash}\n\n")
+                    i = i+1
         
         return ref_status
 
@@ -381,7 +385,8 @@ async def write_to_contact_google_sheet(
 
         sheet = await get_google_sheet(sheet_id, 4)
         
-        
+        if not user_phone.startswith("+"):
+                user_phone = f"+{user_phone.lstrip('+')}"
                    
         # user_row = None
         # for i, row in enumerate(data, start=2):
