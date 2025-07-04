@@ -731,7 +731,7 @@ async def full_bank_info_5(message: Message, state: FSMContext):
     await save_user_data(user_data)
     update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                                 user_id=user_id,
-                                                user_name = user_name,
+                                                username = user_name,
                                                 user_phone=user_phone,
                                                 bank_info_card_number=bank_info_card_number,
                                                 bank_info_bank=bank_info_bank,
