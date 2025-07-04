@@ -268,9 +268,10 @@ async def write_to_lead_google_sheet(
         sheet = await get_google_sheet(sheet_id, 3)
         data = await asyncio.to_thread(sheet.get_all_records)
         
-        for row in data:
+        for row in enumerate(data, start=2):
             if str(ref_phone) == str(row.get('Номер телефона', '')):
                 return False
+        
 
         ref_id = ref_phone
 
