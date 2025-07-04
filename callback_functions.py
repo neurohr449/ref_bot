@@ -472,9 +472,11 @@ async def course_10(callback_query: CallbackQuery, state: FSMContext):
 async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
+    user_phone = user_data.get('phone')
     update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                     user_id=callback_query.from_user.id,
                                     username=callback_query.from_user.username,
+                                    user_phone=user_phone,
                                     status = "Закончил обучение"
                                     )
     print(update_status)
@@ -724,9 +726,11 @@ async def full_bank_info_5(message: Message, state: FSMContext):
     bank_info_bank=user_data.get('bank_bank')
     bank_info_sbp=user_data.get('bank_sbp')
     bank_info_fio=user_data.get('bank_fio')
+    user_phone = user_data.get('phone')
     await save_user_data(user_data)
     update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                                 user_id=user_id,
+                                                user_phone=user_phone,
                                                 bank_info_card_number=bank_info_card_number,
                                                 bank_info_bank=bank_info_bank,
                                                 bank_info_sbp=bank_info_sbp,

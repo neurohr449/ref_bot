@@ -182,8 +182,9 @@ async def write_to_google_sheet(
 
         sheet = await get_google_sheet(sheet_id, 2)
         data = await asyncio.to_thread(sheet.get_all_records)
-        if not user_phone.startswith("+"):
-                user_phone = f"+{user_phone.lstrip('+')}"
+        if user_phone:
+            if not user_phone.startswith("+"):
+                    user_phone = f"+{user_phone.lstrip('+')}"
                    
         user_row = None
         for i, row in enumerate(data, start=2):
