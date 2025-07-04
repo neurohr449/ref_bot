@@ -336,10 +336,10 @@ async def change_bank_info_google_sheet(
         data = await asyncio.to_thread(sheet.get_all_records)
         
         column_map = {
-            "card": "F",
-            "bank": "G",
-            "sbp": "H",
-            "fio": "I"
+            "card": "G",
+            "bank": "H",
+            "sbp": "I",
+            "fio": "J"
         }
         column = column_map[bank_info]
 
