@@ -308,8 +308,9 @@ async def read_lead_google_sheet(
         data = await asyncio.to_thread(sheet.get_all_records)
         print (data)
         ref_status = []
-        for row, i in data:  
-            if i >= 10:
+        i = 0
+        for row in data:  
+            if i <= 10:
                 if str(user_id) == str(row.get('id Партнера', '')) and lead_status == str(row.get('Статус', '')):
                     ref_name = str(row.get('Имя', ''))
                     ref_phone = str(row.get('Номер телефона', ''))
