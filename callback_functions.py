@@ -53,8 +53,9 @@ async def menu_message(message: Message, state: FSMContext):
                   InlineKeyboardButton(text="Условия партнерства", callback_data = "menu_6")],
                   [InlineKeyboardButton(text="Добавить партнера", callback_data = "menu_7"),
                   InlineKeyboardButton(text="Связь с менеджером", callback_data = "menu_8")],
-                  [InlineKeyboardButton(text="Согласие на обработку персональных данных", callback_data = "menu_9"),
-                  InlineKeyboardButton(text="Оферта", callback_data = "menu_10")]
+                  [InlineKeyboardButton(text="Согласие на обработку ПД", callback_data = "menu_9"),
+                  InlineKeyboardButton(text="Оферта", callback_data = "menu_10")],
+                  [InlineKeyboardButton(text="Курс", callback_data = "menu_11")]
                   ],
         
     )
@@ -653,12 +654,21 @@ async def ref_link_1(callback_query: CallbackQuery, state: FSMContext):
 async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change)
     
-    
+    user_id = callback_query.from_user.id
     user_data = await state.get_data()
     card_number = user_data.get('bank_card')
     bank_name = user_data.get('bank_bank')
     bank_sbp = user_data.get('bank_sbp')
     bank_fio = user_data.get('bank_fio')
+    if card_number is None:
+        await load_user_data_to_state(user_id, state)
+        user_data = await state.get_data()
+        card_number = user_data.get('bank_card', "❌ не указан")
+        bank_name = user_data.get('bank_bank', "❌ не указан")
+        bank_sbp = user_data.get('bank_sbp', "❌ не указан")
+        bank_fio = user_data.get('bank_fio', "❌ не указан")
+        sheet_id = user_data.get('sheet_id')
+        await get_table_data(sheet_id, 0, state)
     if card_number != None:
         text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -680,12 +690,21 @@ async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
 async def bank_info_1_message(message: Message, state: FSMContext):
     await state.set_state(UserState.bank_info_change)
     
-    
+    user_id = message.from_user.id
     user_data = await state.get_data()
     card_number = user_data.get('bank_card', "❌ не указан")
     bank_name = user_data.get('bank_bank', "❌ не указан")
     bank_sbp = user_data.get('bank_sbp', "❌ не указан")
     bank_fio = user_data.get('bank_fio', "❌ не указан")
+    if card_number is None:
+        await load_user_data_to_state(user_id, state)
+        user_data = await state.get_data()
+        card_number = user_data.get('bank_card', "❌ не указан")
+        bank_name = user_data.get('bank_bank', "❌ не указан")
+        bank_sbp = user_data.get('bank_sbp', "❌ не указан")
+        bank_fio = user_data.get('bank_fio', "❌ не указан")
+        sheet_id = user_data.get('sheet_id')
+        await get_table_data(sheet_id, 0, state)
     if card_number != None:
         text = f"Ваши реквизиты 📝  \nУ нас сохранены следующие реквизиты для выплат:     \n\n — Номер карты: {card_number}     \n— Банк: {bank_name}     \n— Телефон: {bank_sbp}     \n— ФИО получателя: {bank_fio}   \n\nЧтобы изменить реквизиты, выберите нужную кнопку ниже. 😊"
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
