@@ -89,8 +89,9 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
                   InlineKeyboardButton(text="Условия партнерства", callback_data = "menu_6")],
                   [InlineKeyboardButton(text="Добавить партнера", callback_data = "menu_7"),
                   InlineKeyboardButton(text="Связь с менеджером", callback_data = "menu_8")],
-                  [InlineKeyboardButton(text="Согласие на обработку персональных данных", callback_data = "menu_9"),
-                  InlineKeyboardButton(text="Оферта", callback_data = "menu_10")]
+                  [InlineKeyboardButton(text="Согласие на обработку ПД", callback_data = "menu_9"),
+                  InlineKeyboardButton(text="Оферта", callback_data = "menu_10")],
+                  [InlineKeyboardButton(text="Курс", callback_data = "menu_11")]
                   ],
         
     )
