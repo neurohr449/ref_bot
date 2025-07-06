@@ -310,12 +310,12 @@ async def read_lead_google_sheet(
         ref_status = []
         i = 0
         for row in data:  
-            if i <= 10:
+            if i <= 5:
                 if str(user_id) == str(row.get('id Партнера', '')) and lead_status == str(row.get('Статус', '')):
                     ref_name = str(row.get('Имя', ''))
                     ref_phone = str(row.get('Номер телефона', ''))
                     ref_cash = str(row.get('Запланированная выплата', ''))
-                    ref_status.append(f"Имя реферала:{ref_name} \nНомер телефона:{ref_phone} \nЗапланированная выплата: {ref_cash}\n\n")
+                    ref_status.append(f"Имя реферала: {ref_name} \nНомер телефона: {ref_phone} \nЗапланированная выплата: {ref_cash}\n\n")
                     i = i+1
         
         return ref_status

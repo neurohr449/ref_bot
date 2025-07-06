@@ -87,6 +87,9 @@ async def reg_3_handler(message: Message, state: FSMContext) -> None:
 async def reg_4_handler(message: Message, state: FSMContext) -> None:
     await reg_4(message, state)
     
+@router.callback_query(StateFilter(UserState.reg_4_1))
+async def reg_4_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await reg_4_1(callback_query, state)  
 ######################################################################################################################################################################################################################################################
 @router.callback_query(StateFilter(UserState.reg_4))
 async def course_1_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
@@ -130,6 +133,47 @@ async def course_10_cb_handler(callback_query: CallbackQuery, state: FSMContext)
 
 @router.callback_query(StateFilter(UserState.course_10))
 async def course_10_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await end_course_handler(callback_query, state)
+######################################################################################################################################################################################################################################################
+#########
+@router.callback_query(StateFilter(UserState.menu_course_1))
+async def menu_course_2_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_2(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_2))
+async def menu_course_3_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_3(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_3))
+async def menu_course_4_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_4(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_4))
+async def menu_course_5_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_5(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_5))
+async def menu_course_6_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_6(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_6))
+async def menu_course_7_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_7(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_7))
+async def menu_course_8_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_8(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_8))
+async def menu_course_9_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_9(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_9))
+async def menu_course_10_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_10(callback_query, state)
+
+@router.callback_query(StateFilter(UserState.menu_course_10))
+async def menu_course_10_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await end_course_handler(callback_query, state)
 ######################################################################################################################################################################################################################################################
 #########
@@ -272,6 +316,11 @@ async def pd_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
 @router.callback_query(lambda c: c.data == 'menu_10')
 async def oferta_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await oferta(callback_query, state)
+
+@router.callback_query(lambda c: c.data == 'menu_11')
+async def menu_course_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await menu_course_1(callback_query, state)
+
 
 async def chat_notification(chat_id, text):
     await bot.send_message(chat_id=chat_id,

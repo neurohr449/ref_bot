@@ -176,13 +176,32 @@ async def reg_4(message: Message, state: FSMContext):
     await state.update_data(user_last_name=user_last_name)
     text = f"🔎 Пожалуйста, проверьте введённые данные:      \n\n— Имя: {user_name}     \n— Фамилия:{user_last_name}     \n— Телефон: {phone}  \n\n------ \nЕсли всё верно, нажмите кнопку «Далее» для перехода к следующему шагу.  Если нужно что-то изменить, нажмите «Изменить»— вы сможете внести корректировки."
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Далее", callback_data="next"),InlineKeyboardButton(text="Изменить", callback_data="change")]
+    [InlineKeyboardButton(text="Далее", callback_data="next"),
+     InlineKeyboardButton(text="Изменить", callback_data="change")],
+     [InlineKeyboardButton(text="Оферта", callback_data="oferta"),
+     InlineKeyboardButton(text="Согласие на обработку ПД", callback_data="pd")]
     ])
     user_data = await state.get_data()
     await save_user_data(user_data)
     await message.answer(text=text, reply_markup = keyboard)
     await state.set_state(UserState.reg_4)
 
+async def reg_4_1(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    user_last_name = user_data.get('user_last_name')
+    user_name = user_data.get('user_name')
+    phone = user_data.get('phone')
+    text = f"🔎 Пожалуйста, проверьте введённые данные:      \n\n— Имя: {user_name}     \n— Фамилия:{user_last_name}     \n— Телефон: {phone}  \n\n------ \nЕсли всё верно, нажмите кнопку «Далее» для перехода к следующему шагу.  Если нужно что-то изменить, нажмите «Изменить»— вы сможете внести корректировки."
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Далее", callback_data="next"),
+     InlineKeyboardButton(text="Изменить", callback_data="change")],
+     [InlineKeyboardButton(text="Оферта", callback_data="oferta"),
+     InlineKeyboardButton(text="Согласие на обработку ПД", callback_data="pd")]
+    ])
+    user_data = await state.get_data()
+    await save_user_data(user_data)
+    await callback_query.message.edit_text(text=text, reply_markup = keyboard)
+    await state.set_state(UserState.reg_4)
 ###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###Reg###
 ###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###
 
@@ -259,6 +278,22 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
     elif callback_query.data == "change":
         await callback_query.message.answer("Введите ваше имя")
         await state.set_state(UserState.reg_2)
+    elif callback_query.data == "oferta":
+        user_data = await state.get_data()
+        text = user_data.get('oferta')
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Назад", callback_data="back")]
+            ])
+        await callback_query.message.edit_text(text=text, reply_markup=keyboard)
+        await state.set_state(UserState.reg_4_1)
+    elif callback_query.data == "pd":
+        user_data = await state.get_data()
+        text = user_data.get('pd')
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Назад", callback_data="back")]
+            ])
+        await callback_query.message.edit_text(text=text, reply_markup=keyboard)
+        await state.set_state(UserState.reg_4_1)
 
 async def course_2(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -953,3 +988,249 @@ async def oferta(callback_query: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])
     await callback_query.message.edit_text(text = text, reply_markup=keyboard)
+
+
+########MENU_COURSE########MENU_COURSE########MENU_COURSE########MENU_COURSE########MENU_COURSE########MENU_COURSE########MENU_COURSE########MENU_COURSE########MENU_COURSE########MENU_COURSE########MENU_COURSE#########
+
+async def menu_course_1(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    sheet_id = user_data.get('sheet_id')
+    
+    
+    await get_table_data(sheet_id, 1, state)
+    user_data = await state.get_data()
+    text = user_data.get('text_1')
+    video = user_data.get('video_1')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:
+            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_1)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_1)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+    
+
+async def menu_course_2(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_2')
+    video = user_data.get('video_2')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_2)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_2)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+async def menu_course_3(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_3')
+    video = user_data.get('video_3')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_3)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_3)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+async def menu_course_4(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_4')
+    video = user_data.get('video_4')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_4)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_4)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+async def menu_course_5(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_5')
+    video = user_data.get('video_5')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_5)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_5)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+async def menu_course_6(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_6')
+    video = user_data.get('video_6')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_6)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_6)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+async def menu_course_7(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_7')
+    video = user_data.get('video_7')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_7)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_7)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+async def menu_course_8(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_8')
+    video = user_data.get('video_8')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_8)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_8)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+
+async def menu_course_9(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_9')
+    video = user_data.get('video_9')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Продолжить", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_9)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_9)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+
+async def menu_course_10(callback_query: CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    text = user_data.get('text_10')
+    video = user_data.get('video_10')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Перейти в меню", callback_data="next")]
+            ])
+    if text:
+        match = re.search(TELEGRAM_VIDEO_PATTERN, video)
+        if match:            
+            await callback_query.message.answer_video(video=video)
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_10)
+            await callback_query.answer()
+        else:
+            
+            await callback_query.message.answer(text=text, reply_markup = keyboard)
+            await state.set_state(UserState.menu_course_10)
+            await callback_query.answer()
+    else:
+        await state.set_state(UserState.menu)
+        await menu_end_course_handler(callback_query, state)
+
+async def menu_end_course_handler(callback_query: CallbackQuery, state: FSMContext):
+    await menu(callback_query, state)
