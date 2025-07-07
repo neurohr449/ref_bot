@@ -55,7 +55,7 @@ async def on_startup(bot: Bot):
         print("🔄 Запуск обработчика on_startup")
         # Создаем пул подключений (а не отдельное соединение)
         pool = await get_async_connection()
-        asyncio.create_task(periodic_check(bot, pool, interval=60))
+        asyncio.create_task(periodic_check(bot, pool, interval=3600))
         print("🔄 Фоновая задача periodic_check запущена")
         return pool  # Возвращаем пул для возможного использования
     except Exception as e:
