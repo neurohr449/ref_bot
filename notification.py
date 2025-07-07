@@ -69,7 +69,7 @@ async def check_for_status_updates(bot: Bot, pool, sheet_id: str):
     """
     try:
         leads = await get_google_sheet_notification(sheet_id, 3)
-        
+        print(leads)
         async with pool.acquire() as conn:
             async with conn.transaction():  # Транзакция для атомарности
                 for lead in leads:
@@ -138,6 +138,7 @@ async def periodic_check(bot: Bot, pool, interval: int = 60):
                 for sheet in sheets:
                     sheet_id = sheet['sheet_id']
                     await check_for_status_updates(bot, pool, sheet_id)
+                    print(f"Проверяю {sheet_id}")
                     
         except Exception as e:
             print(f"❌ Ошибка в periodic_check: {e}")
