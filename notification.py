@@ -73,7 +73,8 @@ async def check_for_status_updates(bot: Bot, pool, sheet_id: str):
         async with pool.acquire() as conn:
             async with conn.transaction():  # Транзакция для атомарности
                 for lead in leads:
-                    referral_id = str(int(float(lead["id Реферала"])))
+                    raw_referral_id = str(lead["id Реферала"])
+                    referral_id = f"+{raw_referral_id}"
                     current_status = str(lead["Статус"])
                     
                     # Получаем данные из БД
