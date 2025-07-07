@@ -54,14 +54,7 @@ async def on_startup(bot: Bot):
     try:
         print("🔄 Запуск обработчика on_startup")
         # Создаем пул подключений (а не отдельное соединение)
-        pool = await asyncpg.create_pool(
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME,
-            host=DB_HOST,
-            min_size=1,
-            max_size=10
-        )
+        pool = await get_async_connection()
         asyncio.create_task(periodic_check(bot, pool, interval=60))
         print("🔄 Фоновая задача periodic_check запущена")
         return pool  # Возвращаем пул для возможного использования
