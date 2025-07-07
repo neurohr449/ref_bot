@@ -13,7 +13,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 
 from functions import get_google_sheet_data
-from main import get_chat_id
+
 
 DB_HOST = os.getenv("DB_HOST")          
 DB_PORT = os.getenv("DB_PORT")          
