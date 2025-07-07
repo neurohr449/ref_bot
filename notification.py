@@ -63,58 +63,58 @@ async def add_lead_to_db(conn, referral_id: str, partner_tg_id: str, status: str
         print(f"Ошибка при добавлении лида: {e}")
 
 
-async def check_for_status_updates(bot: Bot, conn, sheet_id: str):
+async def check_for_status_updates(bot: Bot, pool, sheet_id: str):
     """
     Сравнивает текущие статусы в Google Sheets с базой данных и отправляет уведомления об изменениях.
     """
     try:
         # 1. Получаем актуальные данные из Google Sheets
-        leads = await get_google_sheet(sheet_id, 3)  # Ваша функция для чтения таблицы
+        leads = await get_google_sheet(sheet_id, 3)
         
-        # 2. Для каждой строки в таблице проверяем расхождения с БД
-        with conn.cursor() as cursor:
-            for lead in leads:
-                referral_id = str(lead["id Реферала"])
-                current_status = str(lead["Статус"])
-                
-                # 3. Получаем последний сохранённый статус из БД
-                cursor.execute(
-                    """
-                    SELECT last_status, partner_tg_id 
-                    FROM lead_status_updates 
-                    WHERE referral_id = %s AND sheet_id = %s
-                    """,
-                    (referral_id, sheet_id)
-                )
-                result = cursor.fetchone()
-                
-                # 4. Если статус изменился - отправляем уведомление
-                if result:
-                    stored_status, partner_tg_id = result
-                    if stored_status != current_status:
-                        # Отправляем уведомление
-                        chat_id = await get_chat_id(partner_tg_id)
-                        await bot.send_message(
-                            chat_id,
-                            f"🔔 Изменение статуса!\n"
-                            f"ID: {referral_id}\n"
-                            f"Было: {stored_status}\n"
-                            f"Стало: {current_status}"
-                        )
-                        
-                        # Обновляем статус в БД
-                        cursor.execute(
-                            """
-                            UPDATE lead_status_updates 
-                            SET last_status = %s
-                            WHERE referral_id = %s AND sheet_id = %s
-                            """,
-                            (current_status, referral_id, sheet_id)
-                        )
-                        conn.commit()
-                        
+        async with pool.acquire() as conn:
+            async with conn.transaction():
+                for lead in leads:
+                    referral_id = str(lead["id Реферала"])
+                    current_status = str(lead["Статус"])
+                    
+                    # 2. Получаем последний сохранённый статус из БД
+                    result = await conn.fetchrow(
+                        """
+                        SELECT last_status, partner_tg_id 
+                        FROM lead_status_updates 
+                        WHERE referral_id = $1 AND sheet_id = $2
+                        """,
+                        referral_id, sheet_id
+                    )
+                    
+                    # 3. Если статус изменился - отправляем уведомление
+                    if result:
+                        stored_status, partner_tg_id = result['last_status'], result['partner_tg_id']
+                        if stored_status != current_status:
+                            try:
+                                await bot.send_message(
+                                    partner_tg_id,
+                                    f"🔔 Изменение статуса!\n"
+                                    f"ID: {referral_id}\n"
+                                    f"Было: {stored_status}\n"
+                                    f"Стало: {current_status}"
+                                )
+                                
+                                # 4. Обновляем статус в БД
+                                await conn.execute(
+                                    """
+                                    UPDATE lead_status_updates 
+                                    SET last_status = $1
+                                    WHERE referral_id = $2 AND sheet_id = $3
+                                    """,
+                                    current_status, referral_id, sheet_id
+                                )
+                            except Exception as e:
+                                print(f"Ошибка при отправке уведомления: {e}")
+                                
     except Exception as e:
         print(f"Ошибка при проверке обновлений: {e}")
+        raise
 
 
 async def get_async_connection() -> AsyncIterator[asyncpg.Pool]:
