@@ -12,7 +12,7 @@ from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from typing import AsyncIterator
 
-from functions import get_google_sheet_data
+from functions import get_google_sheet
 
 
 DB_HOST = os.getenv("DB_HOST")          
@@ -69,7 +69,7 @@ async def check_for_status_updates(bot: Bot, conn, sheet_id: str):
     """
     try:
         # 1. Получаем актуальные данные из Google Sheets
-        leads = get_google_sheet_data(sheet_id, 3)  # Ваша функция для чтения таблицы
+        leads = await get_google_sheet(sheet_id, 3)  # Ваша функция для чтения таблицы
         
         # 2. Для каждой строки в таблице проверяем расхождения с БД
         with conn.cursor() as cursor:
