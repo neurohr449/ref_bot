@@ -49,11 +49,16 @@ async def command_menu(message: Message, state: FSMContext):
     await menu_message(message, state)
 
 
-async def on_startup(dp: Dispatcher):
+async def on_startup(bot: Bot, dp: Dispatcher):
     """Запуск при старте бота."""
-    pool = await get_async_connection()  # Создаем пул подключений
-    asyncio.create_task(periodic_check(dp.bot, pool, interval=60))
-    print("🔄 Фоновая задача periodic_check запущена!")  # Проверка каждые 30 минут
+    print("🔄 Startup handler called")  # Для отладки
+    try:
+        pool = await get_connection()  # Создаем пул подключений
+        asyncio.create_task(periodic_check(bot, pool, interval=60))
+        print("🔄 Фоновая задача periodic_check запущена!")
+    except Exception as e:
+        print(f"❌ Ошибка в on_startup: {e}")
+        raise
 
 @router.message(CommandStart())
 async def command_start_handler(message: Message, command: CommandObject, state: FSMContext) -> None:
