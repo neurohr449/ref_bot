@@ -6,6 +6,12 @@ import gspread
 from google.oauth2.service_account import Credentials
 import os
 import asyncio
+from aiogram import Bot, Dispatcher, html, Router, BaseMiddleware
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramBadRequest
+
+
 from functions import get_google_sheet_data
 from main import get_chat_id
 
@@ -15,6 +21,17 @@ DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")          
 DB_PASSWORD = os.getenv("DB_PASSWORD")  
 
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(
+    parse_mode=ParseMode.HTML))
+
+async def get_chat_id(user_id: int):
+    try:
+        chat = await bot.get_chat(user_id)  # Получаем чат по user_id
+        return chat.id
+    except TelegramBadRequest:
+        print("Бот не знает этого пользователя или чата!")
+        return None
 
 async def add_lead_to_db(conn, referral_id: str, partner_tg_id: str, status: str, sheet_id: str, sheet_name: str = None):
     """

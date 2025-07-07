@@ -328,17 +328,17 @@ async def oferta_handler(callback_query: CallbackQuery, state: FSMContext) -> No
 async def menu_course_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await menu_course_1(callback_query, state)
 
-async def get_chat_id(user_id: int):
-    try:
-        chat = await bot.get_chat(user_id)  # Получаем чат по user_id
-        return chat.id
-    except TelegramBadRequest:
-        print("Бот не знает этого пользователя или чата!")
-        return None
+# async def get_chat_id(user_id: int):
+#     try:
+#         chat = await bot.get_chat(user_id)  # Получаем чат по user_id
+#         return chat.id
+#     except TelegramBadRequest:
+#         print("Бот не знает этого пользователя или чата!")
+#         return None
 
-async def chat_notification(chat_id, text):
-    await bot.send_message(chat_id=chat_id,
-                           text=text)
+# async def chat_notification(chat_id, text):
+#     await bot.send_message(chat_id=chat_id,
+#                            text=text)
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
