@@ -49,13 +49,13 @@ async def command_menu(message: Message, state: FSMContext):
     await menu_message(message, state)
 
 
-async def on_startup(bot: Bot, dp: Dispatcher):
-    """Запуск при старте бота."""
-    print("🔄 Startup handler called")  # Для отладки
+async def on_startup(bot: Bot):
+    """Обработчик запуска бота."""
     try:
-        pool = await get_async_connection()  # Создаем пул подключений
+        print("🔄 Запуск обработчика on_startup")
+        pool = await get_async_connection()
         asyncio.create_task(periodic_check(bot, pool, interval=60))
-        print("🔄 Фоновая задача periodic_check запущена!")
+        print("🔄 Фоновая задача periodic_check запущена")
     except Exception as e:
         print(f"❌ Ошибка в on_startup: {e}")
         raise

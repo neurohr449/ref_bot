@@ -10,7 +10,7 @@ from aiogram import Bot, Dispatcher, html, Router, BaseMiddleware
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
-
+from typing import AsyncIterator
 
 from functions import get_google_sheet_data
 
@@ -117,16 +117,24 @@ async def check_for_status_updates(bot: Bot, conn, sheet_id: str):
         print(f"Ошибка при проверке обновлений: {e}")
 
 
-async def get_async_connection():
-    """Асинхронное подключение к PostgreSQL."""
-    return await asyncpg.create_pool(
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME,
-        host=DB_HOST,
-        min_size=1,
-        max_size=10
-    )
+async def get_async_connection() -> AsyncIterator[asyncpg.Pool]:
+    """Создает и возвращает пул подключений к PostgreSQL."""
+    try:
+        pool = await asyncpg.create_pool(
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME,
+            host=DB_HOST,
+            port=DB_PORT,
+            min_size=1,
+            max_size=10,
+            timeout=30  # Таймаут подключения в секундах
+        )
+        print("✅ Подключение к PostgreSQL установлено")
+        return pool
+    except Exception as e:
+        print(f"❌ Ошибка подключения к PostgreSQL: {e}")
+        raise
 
 async def periodic_check(bot: Bot, pool, interval: int = 60):
     """Проверяет изменения каждые `interval` секунд."""
