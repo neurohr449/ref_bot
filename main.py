@@ -49,8 +49,10 @@ async def command_menu(message: Message, state: FSMContext):
 
 
 async def on_startup(dp: Dispatcher):
-    conn = get_connection()
-    asyncio.create_task(periodic_check(dp.bot, conn, interval=60))  # Проверка каждые 30 минут
+    """Запуск при старте бота."""
+    pool = await get_connection()  # Создаем пул подключений
+    asyncio.create_task(periodic_check(dp.bot, pool, interval=60))
+    print("🔄 Фоновая задача periodic_check запущена!")  # Проверка каждые 30 минут
 
 @router.message(CommandStart())
 async def command_start_handler(message: Message, command: CommandObject, state: FSMContext) -> None:
