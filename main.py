@@ -53,7 +53,7 @@ async def on_startup(bot: Bot, dp: Dispatcher):
     """Запуск при старте бота."""
     print("🔄 Startup handler called")  # Для отладки
     try:
-        pool = await get_connection()  # Создаем пул подключений
+        pool = await get_async_connection()  # Создаем пул подключений
         asyncio.create_task(periodic_check(bot, pool, interval=60))
         print("🔄 Фоновая задача periodic_check запущена!")
     except Exception as e:
