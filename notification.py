@@ -12,7 +12,7 @@ from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from typing import AsyncIterator
 
-from functions import get_google_sheet
+from functions import get_google_sheet_notification
 
 
 DB_HOST = os.getenv("DB_HOST")          
@@ -68,7 +68,7 @@ async def check_for_status_updates(bot: Bot, pool, sheet_id: str):
     Сравнивает текущие статусы в Google Sheets с базой данных.
     """
     try:
-        leads = await get_google_sheet(sheet_id, 3)
+        leads = await get_google_sheet_notification(sheet_id, 3)
         
         async with pool.acquire() as conn:
             async with conn.transaction():  # Транзакция для атомарности

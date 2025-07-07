@@ -59,6 +59,35 @@ async def get_google_sheet(sheet_id: str, list_index: int):
         print(f"Ошибка доступа к Google Sheets: {e}")
         raise
 
+async def get_google_sheet_notification(sheet_id: str, list_index: int):
+    scope = ["https://www.googleapis.com/auth/spreadsheets"]
+    
+    creds = Credentials.from_service_account_info({
+        "type": os.getenv("GS_TYPE"),
+        "project_id": os.getenv("GS_PROJECT_ID"),
+        "private_key_id": os.getenv("GS_PRIVATE_KEY_ID"),
+        "private_key": os.getenv("GS_PRIVATE_KEY").replace('\\n', '\n'),
+        "client_email": os.getenv("GS_CLIENT_EMAIL"),
+        "client_id": os.getenv("GS_CLIENT_ID"),
+        "auth_uri": os.getenv("GS_AUTH_URI"),
+        "token_uri": os.getenv("GS_TOKEN_URI"),
+        "auth_provider_x509_cert_url": os.getenv("GS_AUTH_PROVIDER_X509_CERT_URL"),
+        "client_x509_cert_url": os.getenv("GS_CLIENT_X509_CERT_URL"),
+        "universe_domain": os.getenv("UNIVERSE_DOMAIN")
+    }, scopes=scope)
+    
+    try:
+        client = await asyncio.to_thread(gspread.authorize, creds)
+        spreadsheet = await asyncio.to_thread(client.open_by_key, sheet_id)
+        worksheet = await asyncio.to_thread(spreadsheet.get_worksheet, list_index)
+        
+        # Получаем все значения из листа
+        records = await asyncio.to_thread(worksheet.get_all_records)
+        return records
+    except Exception as e:
+        print(f"Ошибка доступа к Google Sheets: {e}")
+        raise
+
 async def get_range_data(sheet_id, worksheet, state: FSMContext):
     range_name = "B2:B2"
     value = await get_google_sheet_data(sheet_id, range_name, worksheet)
