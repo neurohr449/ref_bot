@@ -17,7 +17,7 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 from functions import *
 from callback_functions import *
 from all_states import *
-from notification import *
+from notification import periodic_check
 
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
