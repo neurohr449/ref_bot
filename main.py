@@ -348,14 +348,20 @@ async def menu_course_handler(callback_query: CallbackQuery, state: FSMContext) 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     
-    # Сначала создаем бота и диспетчер
+    
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    
+    
     dp = Dispatcher(storage=storage)
     
-    # Затем регистрируем обработчики
-    dp.include_router(router)
+    
     dp.message.middleware(StateMiddleware())
-    dp.startup.register(on_startup)
+    dp.include_router(router)
+    
+    
+    dp.startup.register(on_startup, dispatcher=dp, bot=bot)
+    
+    
     
     await dp.start_polling(bot)
 
