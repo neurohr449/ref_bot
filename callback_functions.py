@@ -17,7 +17,7 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 from functions import *
 from all_states import *
 from database import *
-from main import chat_notification, bot
+from main import chat_notification
 from notification import *
 
 FAIL_KEYBOARD = InlineKeyboardMarkup(inline_keyboard=[
