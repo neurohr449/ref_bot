@@ -359,7 +359,7 @@ async def main() -> None:
     dp.include_router(router)
     
     
-    dp.startup.register(on_startup)
+    dp.startup.register(on_startup(dp=dp, bot=bot))
     
     
     
