@@ -5,7 +5,8 @@ import gspread
 from google.oauth2.service_account import Credentials
 import os
 import asyncio
-from functions import get_google_sheet_data, get_chat_id
+from functions import get_google_sheet_data
+from main import get_chat_id
 
 async def add_lead_to_db(conn, referral_id: str, partner_tg_id: str, status: str, sheet_id: str, sheet_name: str = None):
     """

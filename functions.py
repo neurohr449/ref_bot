@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
 
-from main import bot
+
 
 
 async def get_google_sheet_data(sheet_id, range_name, worksheet):
@@ -377,13 +377,7 @@ async def get_username_by_id(bot: Bot, user_id: int) -> str | None:
         print(f"Ошибка при получении username: {e}")
         return None
 
-async def get_chat_id(user_id: int):
-    try:
-        chat = await bot.get_chat(user_id)  # Получаем чат по user_id
-        return chat.id
-    except TelegramBadRequest:
-        print("Бот не знает этого пользователя или чата!")
-        return None
+
 
 async def write_to_contact_google_sheet(
     sheet_id: str,
