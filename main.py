@@ -48,6 +48,10 @@ async def command_menu(message: Message, state: FSMContext):
     await menu_message(message, state)
 
 
+async def on_startup(dp: Dispatcher):
+    conn = get_connection()
+    asyncio.create_task(periodic_check(dp.bot, conn, interval=60))  # Проверка каждые 30 минут
+
 @router.message(CommandStart())
 async def command_start_handler(message: Message, command: CommandObject, state: FSMContext) -> None:
     await state.set_state(UserState.welcome)

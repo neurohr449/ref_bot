@@ -18,6 +18,7 @@ from functions import *
 from all_states import *
 from database import *
 from main import chat_notification, bot
+from notification import *
 
 FAIL_KEYBOARD = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Попробовать снова", callback_data="retry")]
@@ -241,6 +242,13 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
                                                              ref_cash=ref_cash
                                         )
             print(update_status)
+            conn = get_connection()
+            await add_lead_to_db(conn=conn,
+                                referral_id=user_phone,
+                                partner_tg_id=ref_id,
+                                status = "Рекомендация в работе",
+                                sheet_id=sheet_id
+                                )
             update_status_2 = await write_to_google_sheet(sheet_id=sheet_id,
                                         user_id=callback_query.from_user.id,
                                         username=callback_query.from_user.username,
@@ -588,6 +596,13 @@ async def send_client_5(callback_query: CallbackQuery, state: FSMContext):
         ref_cash=ref_cash
     )
     if update_status == True:
+        conn = get_connection()
+        await add_lead_to_db(conn=conn,
+                                referral_id=lead_phone,
+                                partner_tg_id=callback_query.message.chat.id,
+                                status = "Рекомендация в работе",
+                                sheet_id=sheet_id
+                                )
         chat_text = f"Новый клиент\n\n Имя: {client_name}\nНомер телефона: {lead_phone}"
         chat_id = user_data.get('notification_chat')
         await chat_notification(chat_id, chat_text)
