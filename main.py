@@ -51,7 +51,7 @@ async def command_menu(message: Message, state: FSMContext):
 
 async def on_startup(dp: Dispatcher):
     """Запуск при старте бота."""
-    pool = await get_connection()  # Создаем пул подключений
+    pool = await get_async_connection()  # Создаем пул подключений
     asyncio.create_task(periodic_check(dp.bot, pool, interval=60))
     print("🔄 Фоновая задача periodic_check запущена!")  # Проверка каждые 30 минут
 
@@ -344,6 +344,7 @@ async def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     dp.include_router(router)
     dp.message.middleware(StateMiddleware())
+    dp.startup.register(on_startup)
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(
         parse_mode=ParseMode.HTML))
     await dp.start_polling(bot)
