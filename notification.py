@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2 import sql, errors
+import asyncpg
 from aiogram import Bot, types
 import gspread
 from google.oauth2.service_account import Credentials
@@ -7,6 +8,13 @@ import os
 import asyncio
 from functions import get_google_sheet_data
 from main import get_chat_id
+
+DB_HOST = os.getenv("DB_HOST")          
+DB_PORT = os.getenv("DB_PORT")          
+DB_NAME = os.getenv("DB_NAME")          
+DB_USER = os.getenv("DB_USER")          
+DB_PASSWORD = os.getenv("DB_PASSWORD")  
+
 
 async def add_lead_to_db(conn, referral_id: str, partner_tg_id: str, status: str, sheet_id: str, sheet_name: str = None):
     """
@@ -92,22 +100,30 @@ async def check_for_status_updates(bot: Bot, conn, sheet_id: str):
         print(f"Ошибка при проверке обновлений: {e}")
 
 
-async def periodic_check(bot: Bot, conn, interval: int = 60):
-    """
-    Периодически проверяет все таблицы на изменения.
-    """
+async def get_async_connection():
+    """Асинхронное подключение к PostgreSQL."""
+    return await asyncpg.create_pool(
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME,
+        host=DB_HOST,
+        min_size=1,
+        max_size=10
+    )
+
+async def periodic_check(bot: Bot, pool, interval: int = 60):
+    """Проверяет изменения каждые `interval` секунд."""
     while True:
         try:
-            with conn.cursor() as cursor:
-                # Получаем список всех отслеживаемых таблиц
-                cursor.execute("SELECT sheet_id FROM tracked_sheets")
-                sheets = cursor.fetchall()
-                
+            async with pool.acquire() as conn:  # Берём соединение из пула
+                # Получаем список всех таблиц
+                sheets = await conn.fetch("SELECT sheet_id FROM tracked_sheets")
                 for sheet in sheets:
-                    sheet_id = sheet[0]
-                    await check_for_status_updates(bot, conn, sheet_id)
+                    await check_for_status_updates(bot, conn, sheet['sheet_id'])
                     
-        except Exception as e:
-            print(f"Ошибка в periodic_check: {e}")
+            print(f"✅ Проверка завершена. Ждем {interval} сек...")
             
-        await asyncio.sleep(interval)  # Интервал в секундах
+        except Exception as e:
+            print(f"❌ Ошибка в periodic_check: {e}")
+            
+        await asyncio.sleep(interval)  # Неблокирующее ожидание
