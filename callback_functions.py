@@ -17,14 +17,21 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 from functions import *
 from all_states import *
 from database import *
-from main import chat_notification
+# from main import chat_notification
 from notification import *
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(
+    parse_mode=ParseMode.HTML))
 
 FAIL_KEYBOARD = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Попробовать снова", callback_data="retry")]
             ])
 TELEGRAM_VIDEO_PATTERN = r'https://t\.me/'
 
+async def chat_notification(chat_id, text):
+    await bot.send_message(chat_id=chat_id,
+                           text=text)
 
 async def menu_message(message: Message, state: FSMContext):
     await state.set_state(UserState.menu)
