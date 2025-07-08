@@ -280,8 +280,8 @@ async def write_to_google_sheet(
                 f"https://t.me/{username}",                  # C Ссылка на партнера
                 first_name or "",                            # D Имя
                 last_name,                                   # E Фамилия
-                f"{user_phone}",                                  # F Номер телефона
-                f"{bank_info_card_number}" or "",                 # G Инормация для выплат Номер карты
+                user_phone,                                  # F Номер телефона
+                bank_info_card_number or "",                 # G Инормация для выплат Номер карты
                 bank_info_bank or "",                        # H Инормация для выплат Банк
                 bank_info_sbp or "",                         # I Инормация для выплат Номер телефона СБП
                 bank_info_fio or "",                         # J Инормация для выплат Имя получателя
