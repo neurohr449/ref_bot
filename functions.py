@@ -229,7 +229,7 @@ async def write_to_google_sheet(
 
         user_row = None
         for i, row in enumerate(data, start=2):
-                if str(user_id) == str(row.get('id Партнера', '')):
+                if str(user_id) == str(row.get('id Партнера', '')) and str(user_phone) == str(row.get('Номер телефона', '')):
                     user_row = i
                     break
         
