@@ -217,7 +217,16 @@ async def write_to_google_sheet(
         if user_phone:
             if not user_phone.startswith("+"):
                     user_phone = f"+{user_phone.lstrip('+')}"
-                   
+
+        
+        if user_phone:
+            user_phone = user_phone.lstrip('+')
+            user_phone = f"+{user_phone}"  
+        
+        
+        if bank_info_card_number:
+            bank_info_card_number = f"{bank_info_card_number}"
+
         user_row = None
         for i, row in enumerate(data, start=2):
                 if str(user_id) == str(row.get('id Партнера', '')):
@@ -231,8 +240,8 @@ async def write_to_google_sheet(
             'Ссылка на партнера': f"https://t.me/{username}",
             'Имя': first_name or "",
             'Фамилия': last_name or "",
-            'Номер телефона': f"{user_phone}" or "",
-            'Инормация для выплат Номер карты': f"{bank_info_card_number}" or "",
+            'Номер телефона': user_phone or "",
+            'Инормация для выплат Номер карты': bank_info_card_number or "",
             'Инормация для выплат Банк': bank_info_bank or "",
             'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
             'Инормация для выплат Имя получателя': bank_info_fio or "",
