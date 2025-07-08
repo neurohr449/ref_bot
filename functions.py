@@ -162,17 +162,17 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
 
 
 #
-async def check_user_reg(sheet_id, user_id):
+async def check_user_reg(sheet_id, user_id, phone_number):
     sheet = await get_google_sheet(sheet_id, 2)
     data = await asyncio.to_thread(sheet.get_all_records)
     
     if not data or not isinstance(data, list):
         return False
-    # if not phone_number.startswith("+"):
-    #             phone_number = f"+{phone_number.lstrip('+')}"
+    if not phone_number.startswith("+"):
+                phone_number = f"+{phone_number.lstrip('+')}"
 
     for row in data:  
-        if str(user_id) == str(row.get('id Партнера', '')):
+        if str(user_id) == str(row.get('id Партнера', '')) and str(phone_number) == str(row.get('Номер телефона', '')):
             return True
     
     return False
@@ -229,7 +229,7 @@ async def write_to_google_sheet(
 
         user_row = None
         for i, row in enumerate(data, start=2):
-                if str(user_id) == str(row.get('id Партнера', '')) and str(user_phone) == str(row.get('Номер телефона', '')):
+                if str(user_id) == str(row.get('id Партнера', '')):
                     user_row = i
                     break
         
