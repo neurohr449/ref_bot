@@ -162,14 +162,14 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
 
 
 #
-async def check_user_reg(sheet_id, user_id, phone_number):
+async def check_user_reg(sheet_id, user_id):
     sheet = await get_google_sheet(sheet_id, 2)
     data = await asyncio.to_thread(sheet.get_all_records)
     
     if not data or not isinstance(data, list):
         return False
-    if not phone_number.startswith("+"):
-                phone_number = f"+{phone_number.lstrip('+')}"
+    # if not phone_number.startswith("+"):
+    #             phone_number = f"+{phone_number.lstrip('+')}"
 
     for row in data:  
         if str(user_id) == str(row.get('id Партнера', '')):
@@ -231,8 +231,8 @@ async def write_to_google_sheet(
             'Ссылка на партнера': f"https://t.me/{username}",
             'Имя': first_name or "",
             'Фамилия': last_name or "",
-            'Номер телефона': user_phone or "",
-            'Инормация для выплат Номер карты': bank_info_card_number or "",
+            'Номер телефона': f"{user_phone}" or "",
+            'Инормация для выплат Номер карты': f"{bank_info_card_number}" or "",
             'Инормация для выплат Банк': bank_info_bank or "",
             'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
             'Инормация для выплат Имя получателя': bank_info_fio or "",
@@ -271,8 +271,8 @@ async def write_to_google_sheet(
                 f"https://t.me/{username}",                  # C Ссылка на партнера
                 first_name or "",                            # D Имя
                 last_name,                                   # E Фамилия
-                user_phone,                                  # F Номер телефона
-                bank_info_card_number or "",                 # G Инормация для выплат Номер карты
+                f"{user_phone}",                                  # F Номер телефона
+                f"{bank_info_card_number}" or "",                 # G Инормация для выплат Номер карты
                 bank_info_bank or "",                        # H Инормация для выплат Банк
                 bank_info_sbp or "",                         # I Инормация для выплат Номер телефона СБП
                 bank_info_fio or "",                         # J Инормация для выплат Имя получателя
@@ -299,9 +299,10 @@ async def write_to_lead_google_sheet(
     try:
         sheet = await get_google_sheet(sheet_id, 3)
         data = await asyncio.to_thread(sheet.get_all_records)
-        
+        if ref_phone.startswith("+"):
+                    ref_phone_check = f"{ref_phone.lstrip('+')}"
         for row in data:
-            if str(ref_phone) == str(row.get('Номер телефона', '')):
+            if str(ref_phone_check) == str(row.get('Номер телефона', '')):
                 return False
         
 
@@ -342,7 +343,7 @@ async def read_lead_google_sheet(
         ref_status = []
         i = 0
         for row in data:  
-            if i <= 5:
+            if i <= 9:
                 if str(user_id) == str(row.get('id Партнера', '')) and lead_status == str(row.get('Статус', '')):
                     ref_name = str(row.get('Имя', ''))
                     ref_phone = str(row.get('Номер телефона', ''))

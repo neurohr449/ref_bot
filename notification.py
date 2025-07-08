@@ -69,7 +69,7 @@ async def check_for_status_updates(bot: Bot, pool, sheet_id: str):
     """
     try:
         leads = await get_google_sheet_notification(sheet_id, 3)
-        print(leads)
+        
         async with pool.acquire() as conn:
             async with conn.transaction():  # Транзакция для атомарности
                 for lead in leads:
