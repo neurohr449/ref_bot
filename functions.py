@@ -196,9 +196,10 @@ async def check_user_reg(sheet_id, user_id, phone_number):
     
     if not data or not isinstance(data, list):
         return False
+    formated_phone_number = phone_number.lstrip('+')
     if not phone_number.startswith("+"):
                 phone_number = f"+{phone_number.lstrip('+')}"
-                formated_phone_number = phone_number.lstrip('+')
+                
 
     for row in data:
         if str(phone_number) == str(row.get('Номер телефона', '')) or str(formated_phone_number) == str(row.get('Номер телефона', '')):  
