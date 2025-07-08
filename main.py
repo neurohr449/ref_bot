@@ -350,6 +350,16 @@ async def menu_reg_handler(callback_query: CallbackQuery, state: FSMContext) -> 
 # async def chat_notification(chat_id, text):
 #     await bot.send_message(chat_id=chat_id,
 #                            text=text)
+
+@router.message(Command("get_chat_id"))
+async def chat_command(message: Message, state: FSMContext):
+    chat_id = message.chat.id
+    chat_type = message.chat.type
+    await message.reply(
+        f"🆔 Chat ID: <code>{chat_id}</code>\n"
+        f"📌 Тип чата: {chat_type}",
+        parse_mode="HTML"
+    )
 #
 async def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
