@@ -38,6 +38,7 @@ async def menu_message(message: Message, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
+    user_last_name = user_data.get('user_last_name')
     if sheet_id is None:
         await load_user_data_to_state(user_id, state)
         user_data = await state.get_data()
@@ -49,6 +50,14 @@ async def menu_message(message: Message, state: FSMContext):
     #                         bank_bank = bank_bank,
     #                         bank_sbp = bank_sbp,
     #                         bank_fio = bank_fio)
+    if user_last_name is None:
+        user_db = await load_user_data_to_state(user_id, state)
+        if user_db == False:
+                text = "Для получения доступа в меню необходимо пройти регистрацию"
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Зарегестрироваться", callback_data="registration")]
+                ])
+                await message.answer(text=text, reply_markup=keyboard)
     user_data = await state.get_data()
     name = user_data.get('user_name')
     text = f"🏠 Главное меню 🎉 {name}, рады видеть вас снова! Выберите необходимый раздел для работы с вашими рекомендациями."
@@ -74,8 +83,11 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = callback_query.from_user.id
+    user_last_name = user_data.get('user_last_name')
+    
     if sheet_id is None:
-        await load_user_data_to_state(user_id, state)
+        user_db = await load_user_data_to_state(user_id, state)
+        
         user_data = await state.get_data()
         sheet_id = user_data.get('sheet_id')
         await get_table_data(sheet_id, 0, state)
@@ -85,6 +97,14 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
     #                         bank_bank = bank_bank,
     #                         bank_sbp = bank_sbp,
     #                         bank_fio = bank_fio)
+    if user_last_name is None:
+        user_db = await load_user_data_to_state(user_id, state)
+        if user_db == False:
+                text = "Для получения доступа в меню необходимо пройти регистрацию"
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Зарегестрироваться", callback_data="registration")]
+                ])
+                await callback_query.message.answer(text=text, reply_markup=keyboard)
     user_data = await state.get_data()
     name = user_data.get('user_name')
     text = f"🏠 Главное меню 🎉 {name}, рады видеть вас снова! Выберите необходимый раздел для работы с вашими рекомендациями."

@@ -172,7 +172,7 @@ async def check_user_reg(sheet_id, user_id, phone_number):
                 phone_number = f"+{phone_number.lstrip('+')}"
 
     for row in data:  
-        if str(user_id) == str(row.get('id Партнера', '')) and str(phone_number) == str(row.get('Номер телефона', '')):
+        if str(user_id) == str(row.get('id Партнера', '')):
             return True
     
     return False

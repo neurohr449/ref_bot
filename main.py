@@ -53,11 +53,11 @@ async def on_startup(bot: Bot):
     """Обработчик запуска бота."""
     try:
         print("🔄 Запуск обработчика on_startup")
-        # Создаем пул подключений (а не отдельное соединение)
+        
         pool = await get_async_connection()
         asyncio.create_task(periodic_check(bot, pool, interval=3600))
         print("🔄 Фоновая задача periodic_check запущена")
-        return pool  # Возвращаем пул для возможного использования
+        return pool  
     except Exception as e:
         print(f"❌ Ошибка в on_startup: {e}")
         raise
@@ -335,6 +335,10 @@ async def oferta_handler(callback_query: CallbackQuery, state: FSMContext) -> No
 async def menu_course_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await menu_course_1(callback_query, state)
 
+
+@router.callback_query(lambda c: c.data == 'registration')
+async def menu_reg_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await reg_1(callback_query, state)
 # async def get_chat_id(user_id: int):
 #     try:
 #         chat = await bot.get_chat(user_id)  # Получаем чат по user_id
