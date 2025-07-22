@@ -5,7 +5,8 @@ from google.oauth2.service_account import Credentials
 from aiogram.fsm.context import FSMContext
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
-
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 
@@ -161,30 +162,30 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
     elif worksheet == 1:
         user_data = await state.get_data()
         range_id = user_data.get('func_id')
-        range_name = f"A{range_id}:T{range_id}"
+        range_name = f"A{range_id}:W{range_id}"
         value = await get_google_sheet_data(sheet_id, range_name, worksheet)
         row_data = value[0]
         await state.update_data(
-            text_1=row_data[0],
-            text_2=row_data[1],
-            text_3=row_data[2],
-            text_4=row_data[3],
-            text_5=row_data[4],
-            text_6=row_data[5],
-            text_7=row_data[6],
-            text_8=row_data[7],
-            text_9=row_data[8],
-            text_10=row_data[9],
-            video_1=row_data[10],
-            video_2=row_data[11],
-            video_3=row_data[12],
-            video_4=row_data[13],
-            video_5=row_data[14],
-            video_6=row_data[15],
-            video_7=row_data[16],
-            video_8=row_data[17],
-            video_9=row_data[18],
-            video_10=row_data[19]
+            text_1=row_data[3],
+            text_2=row_data[4],
+            text_3=row_data[5],
+            text_4=row_data[6],
+            text_5=row_data[7],
+            text_6=row_data[8],
+            text_7=row_data[9],
+            text_8=row_data[10],
+            text_9=row_data[11],
+            text_10=row_data[12],
+            video_1=row_data[13],
+            video_2=row_data[14],
+            video_3=row_data[15],
+            video_4=row_data[16],
+            video_5=row_data[17],
+            video_6=row_data[18],
+            video_7=row_data[19],
+            video_8=row_data[20],
+            video_9=row_data[21],
+            video_10=row_data[22]
             )
         
 
@@ -302,8 +303,8 @@ async def write_to_google_sheet(
                 current_values.get('Ссылка на партнера', ''),
                 current_values.get('Имя', ''),
                 current_values.get('Фамилия', ''),
-                str(current_values.get('Номер телефона', '')),
-                str(current_values.get('Инормация для выплат Номер карты', '')),
+                current_values.get('Номер телефона', ''),
+                current_values.get('Инормация для выплат Номер карты', ''),
                 current_values.get('Инормация для выплат Банк', ''),
                 current_values.get('Инормация для выплат Номер телефона СБП', ''),
                 current_values.get('Инормация для выплат Имя получателя', ''),
@@ -370,17 +371,20 @@ async def write_to_lead_google_sheet(
         ref_id = ref_phone
 
         status = "Рекомендация в работе"
-               
-        
+        tz = ZoneInfo('Europe/Moscow')
+        now = datetime.now(tz)       
+        current_date = now.strftime("%Y-%m-%d %H:%M:%S")
             
         new_row = [
-            ref_id,                                     # A id Реферала
-            first_name,                                 # B Имя
-            ref_phone or "",                            # C Номер телефона
-            user_id,                                    # D id Партнера
-            f"https://t.me/{username}" or "" ,          # E Ссылка на партнера    
-            status,                                     # F Статус
-            ref_cash                                    # G Запланированная выплата
+            current_date,                               # A id Реферала
+            ref_id,                                     # B id Реферала
+            first_name,                                 # C Имя
+            ref_phone or "",                            # D Номер телефона
+            user_id,                                    # E id Партнера
+            username,                                   # F id Реферала
+            f"https://t.me/{username}" or "" ,          # G Ссылка на партнера    
+            status,                                     # H Статус
+            ref_cash                                    # I Запланированная выплата
             ]
         
         await asyncio.to_thread(sheet.append_row, new_row)
