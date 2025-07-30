@@ -384,7 +384,7 @@ async def write_to_lead_google_sheet(
             username,                                   # F id Реферала
             f"https://t.me/{username}" or "" ,          # G Ссылка на партнера    
             status,                                     # H Статус
-            ref_cash                                    # I Запланированная выплата
+            int(ref_cash)                               # I Запланированная выплата
             ]
         
         await asyncio.to_thread(sheet.append_row, new_row)
