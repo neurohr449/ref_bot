@@ -72,18 +72,21 @@ async def command_start_handler(message: Message, command: CommandObject, state:
         sheet_id  = parts[0]
         ref_id = parts[1]    
         func_id = parts[2]
+        await state.update_data(sheet_id=sheet_id,
+                            ref_id=ref_id,
+                            func_id=func_id)
+        await get_table_data(sheet_id, 0, state)
+        user_data = await state.get_data()
+        text = user_data.get('welcome_message')
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Регистрация", callback_data="next")]
+        ])
+        
+        await message.answer(f"{text}", reply_markup = keyboard)
     else:
         await message.answer("👋 Здравствуйте. Запустите бота по уникальной ссылке!")
 
-    await state.update_data(sheet_id=sheet_id,
-                            ref_id=ref_id,
-                            func_id=func_id)
-    text = "👋 Добро пожаловать в нашу партнёрскую программу!\n\nВ этом Телеграм-боте доступен ваш личный кабинет партнёра:    \n\n— ➕ Добавление новых рекомендаций    \n\n— 🔄 Статусы добавленных рекомендаций    \n\n— 💰 Выплаты    \n\n— 🎓 Обучение и условия    \n\n— 📞 Связь с персональным менеджером\n\nЧтобы начать зарабатывать на рекомендациях, осталось только зарегистрироваться!"
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Регистрация", callback_data="next")]
-    ])
     
-    await message.answer(f"{text}", reply_markup = keyboard)
 
 @router.callback_query(StateFilter(UserState.welcome))
 async def reg_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:

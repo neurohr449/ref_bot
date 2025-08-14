@@ -44,12 +44,6 @@ async def menu_message(message: Message, state: FSMContext):
         user_data = await state.get_data()
         sheet_id = user_data.get('sheet_id')
         await get_table_data(sheet_id, 0, state)
-    # user_name, bank_card, bank_bank, bank_sbp, bank_fio = await get_user_reg(sheet_id, user_id)
-    # await state.update_data(user_name = user_name,
-    #                         bank_card=bank_card,
-    #                         bank_bank = bank_bank,
-    #                         bank_sbp = bank_sbp,
-    #                         bank_fio = bank_fio)
     if user_last_name is None:
         user_db = await load_user_data_to_state(user_id, state)
         if user_db == False:
@@ -91,12 +85,6 @@ async def menu(callback_query: CallbackQuery, state: FSMContext):
         user_data = await state.get_data()
         sheet_id = user_data.get('sheet_id')
         await get_table_data(sheet_id, 0, state)
-    # user_name, bank_card, bank_bank, bank_sbp, bank_fio = await get_user_reg(sheet_id, user_id)
-    # await state.update_data(user_name = user_name,
-    #                         bank_card=bank_card,
-    #                         bank_bank = bank_bank,
-    #                         bank_sbp = bank_sbp,
-    #                         bank_fio = bank_fio)
     if user_last_name is None:
         user_db = await load_user_data_to_state(user_id, state)
         if user_db == False:
@@ -166,8 +154,8 @@ async def reg_2(message: Message, state: FSMContext):
     elif message.text:
         phone_number = message.text
     if not phone_number.startswith("+"):
-        phone_number = f"+{phone_number.lstrip('+')}"
-    pattern = re.compile(r'^\+7\d{10}$')
+        phone_number = f"{phone_number.lstrip('+')}"
+    pattern = re.compile(r'^(\+7|7)\d{10}$')  
     match = re.fullmatch(pattern, phone_number)
     
     if match:

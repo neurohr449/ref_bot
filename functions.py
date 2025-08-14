@@ -118,14 +118,16 @@ async def get_google_sheet_notification(sheet_id: str, list_index: int):
         raise
 
 async def get_range_data(sheet_id, worksheet, state: FSMContext):
-    range_name = "B2:B2"
+    user_data = await state.get_data()
+    range_num = user_data.get('func_id')
+    range_name = f"B{range_num}:B{range_num}"
     value = await get_google_sheet_data(sheet_id, range_name, worksheet)
     row_data = value[0]
     return row_data[0]
 
 async def get_table_data(sheet_id, worksheet, state: FSMContext):
     
-    if worksheet == 0:
+    
         
         range_name = await get_range_data(sheet_id, worksheet, state)
         value = await get_google_sheet_data(sheet_id, range_name, worksheet)
@@ -133,60 +135,54 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
         await state.update_data(
             notification_chat=row_data[0],
             cash_amount=row_data[2],
-            reg_1=row_data[3],
-            reg_2=row_data[4],
-            reg_3=row_data[5],
-            send_client_1=row_data[6],
-            send_client_2=row_data[7],
-            send_client_3=row_data[8],
-            client_status=row_data[9],
-            ref_link_1=row_data[10],
-            ref_link_2=row_data[11],
-            empty_bank_info=row_data[12],
-            bank_1=row_data[13],
-            bank_2=row_data[14],
-            bank_3=row_data[15],
-            bank_4=row_data[16],
-            partner_chat=row_data[17],
-            tos=row_data[18],
-            add_partner_1=row_data[19],
-            add_partner_2=row_data[20],
-            add_partner_3=row_data[21],
-            add_partner_4=row_data[22],
-            add_partner_5=row_data[23],
-            contuct_us_1 = row_data[24],
-            contuct_us_2 = row_data[25],
-            pd=row_data[26],
-            oferta=row_data[27]
+            welcome_message=row_data[3],
+            reg_1=row_data[4],
+            reg_2=row_data[5],
+            reg_3=row_data[6],
+            send_client_1=row_data[7],
+            send_client_2=row_data[8],
+            send_client_3=row_data[9],
+            client_status=row_data[10],
+            ref_link_1=row_data[11],
+            ref_link_2=row_data[12],
+            empty_bank_info=row_data[13],
+            bank_1=row_data[14],
+            bank_2=row_data[15],
+            bank_3=row_data[16],
+            bank_4=row_data[17],
+            partner_chat=row_data[18],
+            tos=row_data[19],
+            add_partner_1=row_data[20],
+            add_partner_2=row_data[21],
+            add_partner_3=row_data[22],
+            add_partner_4=row_data[23],
+            add_partner_5=row_data[24],
+            contuct_us_1 = row_data[25],
+            contuct_us_2 = row_data[26],
+            pd=row_data[27],
+            oferta=row_data[28],
+            text_1=row_data[29],
+            text_2=row_data[30],
+            text_3=row_data[31],
+            text_4=row_data[32],
+            text_5=row_data[33],
+            text_6=row_data[34],
+            text_7=row_data[35],
+            text_8=row_data[36],
+            text_9=row_data[37],
+            text_10=row_data[38],
+            video_1=row_data[39],
+            video_2=row_data[40],
+            video_3=row_data[41],
+            video_4=row_data[42],
+            video_5=row_data[43],
+            video_6=row_data[44],
+            video_7=row_data[45],
+            video_8=row_data[46],
+            video_9=row_data[47],
+            video_10=row_data[48]
             )
-    elif worksheet == 1:
-        user_data = await state.get_data()
-        range_id = user_data.get('func_id')
-        range_name = f"A{range_id}:W{range_id}"
-        value = await get_google_sheet_data(sheet_id, range_name, worksheet)
-        row_data = value[0]
-        await state.update_data(
-            text_1=row_data[3],
-            text_2=row_data[4],
-            text_3=row_data[5],
-            text_4=row_data[6],
-            text_5=row_data[7],
-            text_6=row_data[8],
-            text_7=row_data[9],
-            text_8=row_data[10],
-            text_9=row_data[11],
-            text_10=row_data[12],
-            video_1=row_data[13],
-            video_2=row_data[14],
-            video_3=row_data[15],
-            video_4=row_data[16],
-            video_5=row_data[17],
-            video_6=row_data[18],
-            video_7=row_data[19],
-            video_8=row_data[20],
-            video_9=row_data[21],
-            video_10=row_data[22]
-            )
+
         
 
 
@@ -199,7 +195,7 @@ async def check_user_reg(sheet_id, user_id, phone_number):
         return False
     formated_phone_number = phone_number.lstrip('+')
     if not phone_number.startswith("+"):
-                phone_number = f"+{phone_number.lstrip('+')}"
+       phone_number = f"{phone_number.lstrip('+')}"
                 
 
     for row in data:
@@ -491,52 +487,7 @@ async def write_to_contact_google_sheet(
         if not user_phone.startswith("+"):
                 user_phone = f"+{user_phone.lstrip('+')}"
                    
-        # user_row = None
-        # for i, row in enumerate(data, start=2):
-        #         if str(user_id) == str(row.get('id Партнера', '')):
-        #             user_row = i
-        #             break
-        
-       
-        # update_data = {
-        #     'id Партнера': user_id,
-        #     'ТГ Ник': f"@{username}",
-        #     'Ссылка на партнера': f"https://t.me/{username}",
-        #     'Имя': first_name or "",
-        #     'Фамилия': last_name or "",
-        #     'Номер телефона': user_phone or "",
-        #     'Инормация для выплат Номер карты': bank_info_card_number or "",
-        #     'Инормация для выплат Банк': bank_info_bank or "",
-        #     'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
-        #     'Инормация для выплат Имя получателя': bank_info_fio or "",
-        #     'Статус': status or ""
-        # }
-       
-        
 
-        # if user_row:
-        #     current_values = data[user_row-2]
-
-        #     for key, value in update_data.items():
-        #         if value is not None and value != "":
-        #             current_values[key] = value
-            
-        #     row_values = [
-        #         current_values.get('id Партнера', ''),
-        #         current_values.get('ТГ Ник', ''),
-        #         current_values.get('Ссылка на партнера', ''),
-        #         current_values.get('Имя', ''),
-        #         current_values.get('Фамилия', ''),
-        #         current_values.get('Номер телефона', ''),
-        #         current_values.get('Инормация для выплат Номер карты', ''),
-        #         current_values.get('Инормация для выплат Банк', ''),
-        #         current_values.get('Инормация для выплат Номер телефона СБП', ''),
-        #         current_values.get('Инормация для выплат Имя получателя', ''),
-        #         current_values.get('Статус', '')
-        #     ]
-            
-        #     await asyncio.to_thread(sheet.update, f'A{user_row}:K{user_row}', [row_values])
-        # else:
             
         new_row = [
             user_id,                                   
