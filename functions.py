@@ -221,7 +221,126 @@ async def get_user_reg(sheet_id, user_id):
             bank_fio = str(row.get('Инормация для выплат Имя получателя', ''))
             return user_name, bank_card, bank_bank, bank_sbp, bank_fio
     
-    
+async def write_to_manager_google_sheet(
+    sheet_id: str,
+    user_id: str,
+    username: str,
+    first_name: str = None,
+    last_name: str = None,
+    user_phone: str = None,
+    bank_info_card_number: str = None,
+    bank_info_bank: str = None,
+    bank_info_sbp: str = None,
+    bank_info_fio: str = None,
+    status: str = None
+) -> bool:
+    try:
+        sheet = await get_google_sheet(sheet_id, 2)
+        data = await asyncio.to_thread(sheet.get_all_records)
+
+        if user_phone:
+            user_phone = user_phone.lstrip('+')
+            user_phone = f"+{user_phone}" 
+
+        user_row = None
+        for i, row in enumerate(data, start=2):
+            if str(user_id) == str(row.get('id Партнера', '')):
+                user_row = i
+                break
+
+        update_data = {
+            'id Партнера': user_id,
+            'ТГ Ник': f"@{username}",
+            'Ссылка на партнера': f"https://t.me/{username}",
+            'Имя': first_name or "",
+            'Фамилия': last_name or "",
+            'Номер телефона': user_phone or "",
+            'Инормация для выплат Номер карты': bank_info_card_number or "",
+            'Инормация для выплат Банк': bank_info_bank or "",
+            'Инормация для выплат Номер телефона СБП': bank_info_sbp or "",
+            'Инормация для выплат Имя получателя': bank_info_fio or "",
+            'Статус': status or ""
+        }
+
+        if user_row:
+            current_values = data[user_row-2]
+            need_phone_format = False
+            need_card_format = False
+
+            if user_phone is not None and str(current_values.get('Номер телефона', '')) != user_phone:
+                need_phone_format = True
+            
+            if bank_info_card_number is not None and str(current_values.get('Инормация для выплат Номер карты', '')) != bank_info_card_number:
+                need_card_format = True
+
+            if need_phone_format or need_card_format:
+                columns_to_format = []
+                if need_phone_format:
+                    columns_to_format.append(f'F{user_row}')
+                if need_card_format:
+                    columns_to_format.append(f'G{user_row}')
+                
+                if columns_to_format:
+                    await asyncio.to_thread(
+                        sheet.format,
+                        ','.join(columns_to_format),
+                        {"numberFormat": {"type": "TEXT"}}
+                    )
+
+            for key, value in update_data.items():
+                if value is not None and value != "":
+                    current_values[key] = value
+
+            row_values = [
+                current_values.get('id Партнера', ''),
+                current_values.get('ТГ Ник', ''),
+                current_values.get('Ссылка на партнера', ''),
+                current_values.get('Имя', ''),
+                current_values.get('Фамилия', ''),
+                current_values.get('Номер телефона', ''),
+                current_values.get('Инормация для выплат Номер карты', ''),
+                current_values.get('Инормация для выплат Банк', ''),
+                current_values.get('Инормация для выплат Номер телефона СБП', ''),
+                current_values.get('Инормация для выплат Имя получателя', ''),
+                current_values.get('Статус', '')
+            ]
+            
+            await asyncio.to_thread(sheet.update, f'A{user_row}:K{user_row}', [row_values])
+        else:
+            new_row = [
+                user_id,
+                f"@{username}",
+                f"https://t.me/{username}",
+                first_name or "",
+                last_name or "",
+                user_phone,
+                bank_info_card_number,
+                bank_info_bank or "",
+                bank_info_sbp or "",
+                bank_info_fio or "",
+                status or ""
+            ]
+            
+            last_row = len(data) + 2
+            if user_phone is not None:
+                await asyncio.to_thread(
+                    sheet.format,
+                    f'F{last_row}',
+                    {"numberFormat": {"type": "TEXT"}}
+                )
+            if bank_info_card_number is not None:
+                await asyncio.to_thread(
+                    sheet.format,
+                    f'G{last_row}',
+                    {"numberFormat": {"type": "TEXT"}}
+                )
+            
+            await asyncio.to_thread(sheet.append_row, new_row)
+
+        return True
+    except Exception as e:
+        print(f"Ошибка записи в Google Sheets: {e}")
+        return False    
 
 async def write_to_google_sheet(
     sheet_id: str,
