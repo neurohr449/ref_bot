@@ -235,7 +235,7 @@ async def write_to_manager_google_sheet(
     status: str = None
 ) -> bool:
     try:
-        sheet = await get_google_sheet(sheet_id, 2)
+        sheet = await get_google_sheet(sheet_id, 1)
         data = await asyncio.to_thread(sheet.get_all_records)
 
         if user_phone:
