@@ -296,19 +296,19 @@ async def write_to_manager_google_sheet(
                 status or ""
             ]
             
-            last_row = len(data) + 2
-            if user_phone is not None:
-                await asyncio.to_thread(
-                    sheet.format,
-                    f'F{last_row}',
-                    {"numberFormat": {"type": "TEXT"}}
-                )
-            if bank_info_card_number is not None:
-                await asyncio.to_thread(
-                    sheet.format,
-                    f'G{last_row}',
-                    {"numberFormat": {"type": "TEXT"}}
-                )
+            # last_row = len(data) + 2
+            # if user_phone is not None:
+            #     await asyncio.to_thread(
+            #         sheet.format,
+            #         f'F{last_row}',
+            #         {"numberFormat": {"type": "TEXT"}}
+            #     )
+            # if bank_info_card_number is not None:
+            #     await asyncio.to_thread(
+            #         sheet.format,
+            #         f'G{last_row}',
+            #         {"numberFormat": {"type": "TEXT"}}
+            #     )
             
             await asyncio.to_thread(sheet.append_row, new_row)
 
