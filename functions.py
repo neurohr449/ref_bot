@@ -198,11 +198,16 @@ async def check_user_reg(sheet_id, user_id, phone_number, func_id):
     if not phone_number.startswith("+"):
        phone_number = f"{phone_number.lstrip('+')}"
                 
-
-    for row in data:
-        if str(phone_number) == str(row.get('Номер телефона', '')) or str(formated_phone_number) == str(row.get('Номер телефона', '')):  
-            if str(user_id) == str(row.get('id Партнера', '')):
-                return True
+    if func_id == "2":
+        for row in data:
+            if str(phone_number) == str(row.get('Номер телефона', '')) or str(formated_phone_number) == str(row.get('Номер телефона', '')):  
+                if str(user_id) == str(row.get('id Партнера', '')):
+                    return True
+    if func_id == "4":
+        for row in data:
+            if str(phone_number) == str(row.get('Номер телефона', '')) or str(formated_phone_number) == str(row.get('Номер телефона', '')):  
+                if str(user_id) == str(row.get('id Менеджера', '')):
+                    return True
     
     return False
 
