@@ -246,16 +246,16 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
         if func_id == "2":
             if not user_phone.startswith("+"):
                 user_phone = f"+{user_phone.lstrip('+')}"
-                user_data = await state.get_data()
+                
             
-                update_status = await write_to_google_sheet(sheet_id=sheet_id,
-                                        user_id=callback_query.from_user.id,
-                                        username=callback_query.from_user.username,
-                                        first_name=first_name,
-                                        last_name=last_name,
-                                        user_phone=user_phone,
-                                        status = "Начал обучение"
-                                        )
+            update_status = await write_to_google_sheet(sheet_id=sheet_id,
+                                    user_id=callback_query.from_user.id,
+                                    username=callback_query.from_user.username,
+                                    first_name=first_name,
+                                    last_name=last_name,
+                                    user_phone=user_phone,
+                                    status = "Начал обучение"
+                                    )
 
             chat_text = f"Новый партнер прошел регистрацию и начал обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
             chat_id = user_data.get('notification_chat')
