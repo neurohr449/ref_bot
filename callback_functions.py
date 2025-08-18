@@ -125,8 +125,12 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
     user_id=callback_query.from_user.id
     await state.update_data(tg_id = user_id)
     await get_table_data(sheet_id, 0, state)
-    user_data = await state.get_data()
+   
+    
+    
     func_id = user_data.get('func_id')
+
+
     if func_id == "2":
         update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                         user_id=callback_query.from_user.id,
@@ -234,6 +238,7 @@ async def reg_4_1(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_1(callback_query: CallbackQuery, state: FSMContext):
     if callback_query.data == "next":
+        await state.update_data(survey_completed=True)
         user_data = await state.get_data()
         sheet_id = user_data.get('sheet_id')
         user_phone = user_data.get('phone')

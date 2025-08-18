@@ -177,7 +177,22 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
         video_7=row_data[45],
         video_8=row_data[46],
         video_9=row_data[47],
-        video_10=row_data[48]
+        video_10=row_data[48],
+        timer1=row_data[49],
+        survey1=row_data[50],
+        survey_target5=row_data[51],
+        timer2=row_data[52],
+        survey2=row_data[53],
+        survey_target5=row_data[54],
+        timer3=row_data[55],
+        survey3=row_data[56],
+        survey_target5=row_data[57],
+        timer4=row_data[58],
+        survey4=row_data[59],
+        survey_target5=row_data[60],
+        timer5=row_data[61],
+        survey5=row_data[62],
+        survey_target5=row_data[63]
         )
 
         
@@ -582,3 +597,5 @@ async def write_to_contact_google_sheet(
     except Exception as e:
         print(f"Ошибка записи в Google Sheets: {e}")
         return False
+
+

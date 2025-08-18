@@ -90,6 +90,14 @@ async def command_start_handler(message: Message, command: CommandObject, state:
 
 @router.callback_query(StateFilter(UserState.welcome))
 async def reg_1_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await state.update_data(
+        survey_started=datetime.now(),
+        survey_completed=False
+    )
+    user_data = await state.get_data()
+    for i in range(1, 6):
+        if user_data.get(f"survey{i}") and user_data.get(f"survey_target{i}") == "Этап регистрации":
+            asyncio.create_task(check_survey_completion(callback_query.message.chat.id, state, i))
     await reg_1(callback_query, state)
 
 @router.message(StateFilter(UserState.reg_1))
@@ -110,6 +118,14 @@ async def reg_4_1_handler(callback_query: CallbackQuery, state: FSMContext) -> N
 ######################################################################################################################################################################################################################################################
 @router.callback_query(StateFilter(UserState.reg_4))
 async def course_1_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    await state.update_data(
+        survey_started=datetime.now(),
+        survey_completed=False
+    )
+    user_data = await state.get_data()
+    for i in range(1, 6):
+        if user_data.get(f"survey{i}") and user_data.get(f"survey_target{i}") == "Этап обучения":
+            asyncio.create_task(check_survey_completion(callback_query.message.chat.id, state, i))
     await course_1(callback_query, state)
 
 @router.callback_query(StateFilter(UserState.course_1))
@@ -364,6 +380,24 @@ async def chat_command(message: Message, state: FSMContext):
         parse_mode="HTML"
     )
 #
+async def check_survey_completion(chat_id: int, state: FSMContext, i):
+    data = await state.get_data()
+    timer = int(data.get(f"timer{i}")) * 60
+    await asyncio.sleep(timer)  
+    
+    
+    if not data.get("survey_completed", False):
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Продолжить", callback_data="notification")]
+        ])
+        await bot.send_message(chat_id, f"{data.get(f'text{i}')}",reply_markup=keyboard)
+
+
+
+
+
+
+
 async def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     
