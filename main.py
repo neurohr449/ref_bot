@@ -390,10 +390,43 @@ async def check_survey_completion(chat_id: int, state: FSMContext, i):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Продолжить", callback_data="notification")]
         ])
-        await bot.send_message(chat_id, f"{data.get(f'text{i}')}",reply_markup=keyboard)
+        await bot.send_message(chat_id, f"{data.get(f'survey{i}')}",reply_markup=keyboard)
 
 
+@router.callback_query(lambda c: c.data == 'notification')
+async def notification_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
+    current_state = await state.get_state()
 
+    if current_state == UserState.reg_1.state:
+         await reg_1(callback_query, state)
+    elif current_state == UserState.reg_2.state:
+         await reg_2(callback_query, state)
+    elif current_state == UserState.reg_3.state:
+         await reg_3(callback_query, state)
+    elif current_state == UserState.reg_4.state:
+         await reg_4(callback_query, state)
+    elif current_state == UserState.reg_4_1.state:
+         await reg_4_1(callback_query, state)
+    elif current_state == UserState.course_1.state:
+         await course_1(callback_query, state)
+    elif current_state == UserState.course_2.state:
+         await course_2(callback_query.message, state)
+    elif current_state == UserState.course_3.state:
+         await course_3(callback_query.message, state)
+    elif current_state == UserState.course_4.state:
+         await course_4(callback_query.message, state)
+    elif current_state == UserState.course_5.state:
+         await course_5(callback_query.message, state)
+    elif current_state == UserState.course_6.state:
+         await course_6(callback_query.message, state)
+    elif current_state == UserState.course_7.state:
+         await course_7(callback_query.message, state)
+    elif current_state == UserState.course_8.state:
+         await course_8(callback_query.message, state)
+    elif current_state == UserState.course_9.state:
+         await course_9(callback_query.message, state)
+    elif current_state == UserState.course_10.state:
+         await course_10(callback_query.message, state)
 
 
 
