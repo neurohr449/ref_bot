@@ -157,6 +157,7 @@ async def reg_2(message: Message, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_id = message.from_user.id
+    func_id = user_data.get('func_id')
     if message.contact and message.contact.phone_number:
         phone_number = message.contact.phone_number
     elif message.text:
@@ -169,7 +170,7 @@ async def reg_2(message: Message, state: FSMContext):
     if match:
         
         if phone_number:
-            user_reg_status = await check_user_reg(sheet_id, user_id, phone_number)
+            user_reg_status = await check_user_reg(sheet_id, user_id, phone_number, func_id)
             if user_reg_status == False:
                 await state.update_data(phone=phone_number)
                 await message.answer(text = f"Мы не нашли личный кабинет по номеру телефона {phone_number}. Давайте зарегистрируем вас.  \n\n✏️ Пожалуйста, введите ваше имя, чтобы продолжить.", reply_markup=ReplyKeyboardRemove())
