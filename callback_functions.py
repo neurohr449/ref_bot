@@ -695,7 +695,7 @@ async def ref_link_1(callback_query: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
     await callback_query.message.edit_text(text = text)
-    await callback_query.message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_2", reply_markup = keyboard)
+    await callback_query.message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_3", reply_markup = keyboard)
 
 async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change)
@@ -1062,7 +1062,7 @@ async def menu_course_1(callback_query: CallbackQuery, state: FSMContext):
     sheet_id = user_data.get('sheet_id')
     
     
-    await get_table_data(sheet_id, 1, state)
+    await get_table_data(sheet_id, 0, state)
     user_data = await state.get_data()
     text = user_data.get('text_1')
     video = user_data.get('video_1')

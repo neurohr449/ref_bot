@@ -382,28 +382,28 @@ async def write_to_google_sheet(
 
         if user_row:
             current_values = data[user_row-2]
-            need_phone_format = False
-            need_card_format = False
+            # need_phone_format = False
+            # need_card_format = False
 
-            if user_phone is not None and str(current_values.get('Номер телефона', '')) != user_phone:
-                need_phone_format = True
+            # if user_phone is not None and str(current_values.get('Номер телефона', '')) != user_phone:
+            #     need_phone_format = True
             
-            if bank_info_card_number is not None and str(current_values.get('Инормация для выплат Номер карты', '')) != bank_info_card_number:
-                need_card_format = True
+            # if bank_info_card_number is not None and str(current_values.get('Инормация для выплат Номер карты', '')) != bank_info_card_number:
+            #     need_card_format = True
 
-            if need_phone_format or need_card_format:
-                columns_to_format = []
-                if need_phone_format:
-                    columns_to_format.append(f'F{user_row}')
-                if need_card_format:
-                    columns_to_format.append(f'G{user_row}')
+            # if need_phone_format or need_card_format:
+            #     columns_to_format = []
+            #     if need_phone_format:
+            #         columns_to_format.append(f'F{user_row}')
+            #     if need_card_format:
+            #         columns_to_format.append(f'G{user_row}')
                 
-                if columns_to_format:
-                    await asyncio.to_thread(
-                        sheet.format,
-                        ','.join(columns_to_format),
-                        {"numberFormat": {"type": "TEXT"}}
-                    )
+            #     if columns_to_format:
+            #         await asyncio.to_thread(
+            #             sheet.format,
+            #             ','.join(columns_to_format),
+            #             {"numberFormat": {"type": "TEXT"}}
+            #         )
 
             for key, value in update_data.items():
                 if value is not None and value != "":
@@ -439,19 +439,19 @@ async def write_to_google_sheet(
                 status or ""
             ]
             
-            last_row = len(data) + 2
-            if user_phone is not None:
-                await asyncio.to_thread(
-                    sheet.format,
-                    f'F{last_row}',
-                    {"numberFormat": {"type": "TEXT"}}
-                )
-            if bank_info_card_number is not None:
-                await asyncio.to_thread(
-                    sheet.format,
-                    f'G{last_row}',
-                    {"numberFormat": {"type": "TEXT"}}
-                )
+            # last_row = len(data) + 2
+            # if user_phone is not None:
+            #     await asyncio.to_thread(
+            #         sheet.format,
+            #         f'F{last_row}',
+            #         {"numberFormat": {"type": "TEXT"}}
+            #     )
+            # if bank_info_card_number is not None:
+            #     await asyncio.to_thread(
+            #         sheet.format,
+            #         f'G{last_row}',
+            #         {"numberFormat": {"type": "TEXT"}}
+            #     )
             
             await asyncio.to_thread(sheet.append_row, new_row)
 
@@ -543,17 +543,19 @@ async def change_bank_info_google_sheet(
     bank_info: str,
     subject_to_change: str
 ) -> bool:
-
+    
     try:
+
         sheet = await get_google_sheet(sheet_id, 2)
         data = await asyncio.to_thread(sheet.get_all_records)
-        
+
         column_map = {
             "card": "G",
             "bank": "H",
             "sbp": "I",
             "fio": "J"
         }
+
         column = column_map[bank_info]
 
         for i, row in enumerate(data, start=2):  
@@ -562,14 +564,8 @@ async def change_bank_info_google_sheet(
                 await asyncio.to_thread(sheet.update, cell, [[subject_to_change]])
                 break  
 
-
-        return        
-        
-        
-
-
-
-
+        return   
+         
     except Exception as e:
         print(f"Ошибка записи в Google Sheets: {e}")
         return False
