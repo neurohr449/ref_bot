@@ -267,9 +267,9 @@ async def write_to_manager_google_sheet(
                     current_values[key] = value
 
             row_values = [
-                current_values.get('id Партнера', ''),
+                current_values.get('id Менеджера', ''),
                 str(current_values.get('ТГ Ник', '')),
-                str(current_values.get('Ссылка на партнера', '')),
+                str(current_values.get('Ссылка на менеджера', '')),
                 str(current_values.get('Имя', '')),
                 str(current_values.get('Фамилия', '')),
                 str(current_values.get('Номер телефона', '')),
