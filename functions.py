@@ -241,14 +241,14 @@ async def write_to_manager_google_sheet(
 
         user_row = None
         for i, row in enumerate(data, start=2):
-            if str(user_id) == str(row.get('id Партнера', '')):
+            if str(user_id) == str(row.get('id Менеджера', '')):
                 user_row = i
                 break
 
         update_data = {
-            'id Партнера': user_id,
+            'id Менеджера': user_id,
             'ТГ Ник': f"@{username}",
-            'Ссылка на партнера': f"https://t.me/{username}",
+            'Ссылка на менеджера': f"https://t.me/{username}",
             'Имя': first_name or "",
             'Фамилия': last_name or "",
             'Номер телефона': user_phone or "",
@@ -261,28 +261,6 @@ async def write_to_manager_google_sheet(
 
         if user_row:
             current_values = data[user_row-2]
-            need_phone_format = False
-            need_card_format = False
-
-            if user_phone is not None and str(current_values.get('Номер телефона', '')) != user_phone:
-                need_phone_format = True
-            
-            if bank_info_card_number is not None and str(current_values.get('Инормация для выплат Номер карты', '')) != bank_info_card_number:
-                need_card_format = True
-
-            if need_phone_format or need_card_format:
-                columns_to_format = []
-                if need_phone_format:
-                    columns_to_format.append(f'F{user_row}')
-                if need_card_format:
-                    columns_to_format.append(f'G{user_row}')
-                
-                if columns_to_format:
-                    await asyncio.to_thread(
-                        sheet.format,
-                        ','.join(columns_to_format),
-                        {"numberFormat": {"type": "TEXT"}}
-                    )
 
             for key, value in update_data.items():
                 if value is not None and value != "":
@@ -290,16 +268,16 @@ async def write_to_manager_google_sheet(
 
             row_values = [
                 current_values.get('id Партнера', ''),
-                current_values.get('ТГ Ник', ''),
-                current_values.get('Ссылка на партнера', ''),
-                current_values.get('Имя', ''),
-                current_values.get('Фамилия', ''),
-                current_values.get('Номер телефона', ''),
-                current_values.get('Инормация для выплат Номер карты', ''),
-                current_values.get('Инормация для выплат Банк', ''),
-                current_values.get('Инормация для выплат Номер телефона СБП', ''),
-                current_values.get('Инормация для выплат Имя получателя', ''),
-                current_values.get('Статус', '')
+                str(current_values.get('ТГ Ник', '')),
+                str(current_values.get('Ссылка на партнера', '')),
+                str(current_values.get('Имя', '')),
+                str(current_values.get('Фамилия', '')),
+                str(current_values.get('Номер телефона', '')),
+                str(current_values.get('Инормация для выплат Номер карты', '')),
+                str(current_values.get('Инормация для выплат Банк', '')),
+                str(current_values.get('Инормация для выплат Номер телефона СБП', '')),
+                str(current_values.get('Инормация для выплат Имя получателя', '')),
+                str(current_values.get('Статус', ''))
             ]
             
             await asyncio.to_thread(sheet.update, f'A{user_row}:K{user_row}', [row_values])
@@ -382,35 +360,13 @@ async def write_to_google_sheet(
 
         if user_row:
             current_values = data[user_row-2]
-            # need_phone_format = False
-            # need_card_format = False
-
-            # if user_phone is not None and str(current_values.get('Номер телефона', '')) != user_phone:
-            #     need_phone_format = True
-            
-            # if bank_info_card_number is not None and str(current_values.get('Инормация для выплат Номер карты', '')) != bank_info_card_number:
-            #     need_card_format = True
-
-            # if need_phone_format or need_card_format:
-            #     columns_to_format = []
-            #     if need_phone_format:
-            #         columns_to_format.append(f'F{user_row}')
-            #     if need_card_format:
-            #         columns_to_format.append(f'G{user_row}')
-                
-            #     if columns_to_format:
-            #         await asyncio.to_thread(
-            #             sheet.format,
-            #             ','.join(columns_to_format),
-            #             {"numberFormat": {"type": "TEXT"}}
-            #         )
 
             for key, value in update_data.items():
                 if value is not None and value != "":
                     current_values[key] = value
 
             row_values = [
-                str(current_values.get('id Партнера', '')),
+                current_values.get('id Партнера', ''),
                 str(current_values.get('ТГ Ник', '')),
                 str(current_values.get('Ссылка на партнера', '')),
                 str(current_values.get('Имя', '')),

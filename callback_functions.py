@@ -126,11 +126,19 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
     await state.update_data(tg_id = user_id)
     await get_table_data(sheet_id, 0, state)
     user_data = await state.get_data()
-    update_status = await write_to_google_sheet(sheet_id=sheet_id,
-                                    user_id=callback_query.from_user.id,
-                                    username=callback_query.from_user.username,
-                                    status="Начал чат-бота"
-                                    )
+    func_id = user_data.get('func_id')
+    if func_id == "2":
+        update_status = await write_to_google_sheet(sheet_id=sheet_id,
+                                        user_id=callback_query.from_user.id,
+                                        username=callback_query.from_user.username,
+                                        status="Начал чат-бота"
+                                        )
+    elif func_id == "4":
+        update_status = await write_to_manager_google_sheet(sheet_id=sheet_id,
+                                        user_id=callback_query.from_user.id,
+                                        username=callback_query.from_user.username,
+                                        status="Начал чат-бота"
+                                        )
     text = user_data.get('reg_1')
     text_2 = user_data.get('reg_2')
     contact_keyboard = ReplyKeyboardMarkup(
@@ -237,7 +245,12 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
             if func_id == "2":
                 if not user_phone.startswith("+"):
                     user_phone = f"+{user_phone.lstrip('+')}"
-                update_status = await write_to_google_sheet(sheet_id=sheet_id,
+                    user_data = await state.get_data()
+                func_id = user_data.get('func_id')
+                if func_id == "2":
+
+                
+                    update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                             user_id=callback_query.from_user.id,
                                             username=callback_query.from_user.username,
                                             first_name=first_name,
@@ -245,7 +258,15 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
                                             user_phone=user_phone,
                                             status = "Начал обучение"
                                             )
-                print(update_status)
+                elif func_id == "4":
+                    update_status = await write_to_manager_google_sheet(sheet_id=sheet_id,
+                                            user_id=callback_query.from_user.id,
+                                            username=callback_query.from_user.username,
+                                            first_name=first_name,
+                                            last_name=last_name,
+                                            user_phone=user_phone,
+                                            status = "Начал обучение"
+                                            )
                 chat_text = f"Новый партнер прошел регистрацию и начал обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
                 chat_id = user_data.get('notification_chat')
                 await chat_notification(chat_id, chat_text)
@@ -281,15 +302,25 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
                                 status = "Рекомендация в работе",
                                 sheet_id=sheet_id
                                 )
-            update_status_2 = await write_to_google_sheet(sheet_id=sheet_id,
-                                        user_id=callback_query.from_user.id,
-                                        username=callback_query.from_user.username,
-                                        first_name=first_name,
-                                        last_name=last_name,
-                                        user_phone=user_phone,
-                                        status = "Начал обучение"
-                                        )
-            print(update_status_2)
+            func_id = user_data.get('func_id')
+            if func_id == "2":
+                update_status_2 = await write_to_google_sheet(sheet_id=sheet_id,
+                                            user_id=callback_query.from_user.id,
+                                            username=callback_query.from_user.username,
+                                            first_name=first_name,
+                                            last_name=last_name,
+                                            user_phone=user_phone,
+                                            status = "Начал обучение"
+                                            )
+            if func_id == "4":
+                update_status_2 = await write_to_manager_google_sheet(sheet_id=sheet_id,
+                                            user_id=callback_query.from_user.id,
+                                            username=callback_query.from_user.username,
+                                            first_name=first_name,
+                                            last_name=last_name,
+                                            user_phone=user_phone,
+                                            status = "Начал обучение"
+                                            )
             chat_text = f"Новый клиент прошел регистрацию и начал обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
             chat_id = user_data.get('notification_chat')
             await chat_notification(chat_id, chat_text)
@@ -550,12 +581,21 @@ async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_phone = user_data.get('phone')
-    await write_to_google_sheet(sheet_id=sheet_id,
-                                user_id=callback_query.from_user.id,
-                                username=callback_query.from_user.username,
-                                user_phone=user_phone,
-                                status = "Закончил обучение"
-                                )
+    func_id = user_data.get('func_id')
+    if func_id == "2":
+        await write_to_google_sheet(sheet_id=sheet_id,
+                                    user_id=callback_query.from_user.id,
+                                    username=callback_query.from_user.username,
+                                    user_phone=user_phone,
+                                    status = "Закончил обучение"
+                                    )
+    elif func_id == "4":
+        await write_to_manager_google_sheet(sheet_id=sheet_id,
+                                    user_id=callback_query.from_user.id,
+                                    username=callback_query.from_user.username,
+                                    user_phone=user_phone,
+                                    status = "Закончил обучение"
+                                    )
     first_name=user_data.get('user_name')
     last_name=user_data.get('user_last_name')
     chat_id = user_data.get('notification_chat')
@@ -829,15 +869,26 @@ async def full_bank_info_5(message: Message, state: FSMContext):
     user_phone = user_data.get('phone')
     user_name = message.from_user.username
     await save_user_data(user_data)
-    update_status = await write_to_google_sheet(sheet_id=sheet_id,
-                                                user_id=user_id,
-                                                username = user_name,
-                                                user_phone=user_phone,
-                                                bank_info_card_number=bank_info_card_number,
-                                                bank_info_bank=bank_info_bank,
-                                                bank_info_sbp=bank_info_sbp,
-                                                bank_info_fio=bank_info_fio)
-    print(update_status)
+    func_id = user_data.get('func_id')
+    if func_id == "2":
+        update_status = await write_to_google_sheet(sheet_id=sheet_id,
+                                                    user_id=user_id,
+                                                    username = user_name,
+                                                    user_phone=user_phone,
+                                                    bank_info_card_number=bank_info_card_number,
+                                                    bank_info_bank=bank_info_bank,
+                                                    bank_info_sbp=bank_info_sbp,
+                                                    bank_info_fio=bank_info_fio)
+    elif func_id == "4":
+        update_status = await write_to_manager_google_sheet(sheet_id=sheet_id,
+                                                    user_id=user_id,
+                                                    username = user_name,
+                                                    user_phone=user_phone,
+                                                    bank_info_card_number=bank_info_card_number,
+                                                    bank_info_bank=bank_info_bank,
+                                                    bank_info_sbp=bank_info_sbp,
+                                                    bank_info_fio=bank_info_fio)
+    
     await bank_info_1_message(message, state)
 
 async def bank_info_change_card_number(callback_query: CallbackQuery, state: FSMContext):
