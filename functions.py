@@ -185,6 +185,8 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
 
 #
 async def check_user_reg(sheet_id, user_id, phone_number, func_id):
+    if func_id == "3":
+        return False
     if func_id == "2":
         sheet = await get_google_sheet_ro(sheet_id, 2)
         data = await asyncio.to_thread(sheet.get_all_records)
