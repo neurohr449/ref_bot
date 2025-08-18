@@ -410,17 +410,17 @@ async def write_to_google_sheet(
                     current_values[key] = value
 
             row_values = [
-                current_values.get('id Партнера', ''),
-                current_values.get('ТГ Ник', ''),
-                current_values.get('Ссылка на партнера', ''),
-                current_values.get('Имя', ''),
-                current_values.get('Фамилия', ''),
-                current_values.get('Номер телефона', ''),
+                str(current_values.get('id Партнера', '')),
+                str(current_values.get('ТГ Ник', '')),
+                str(current_values.get('Ссылка на партнера', '')),
+                str(current_values.get('Имя', '')),
+                str(current_values.get('Фамилия', '')),
+                str(current_values.get('Номер телефона', '')),
                 str(current_values.get('Инормация для выплат Номер карты', '')),
-                current_values.get('Инормация для выплат Банк', ''),
-                current_values.get('Инормация для выплат Номер телефона СБП', ''),
-                current_values.get('Инормация для выплат Имя получателя', ''),
-                current_values.get('Статус', '')
+                str(current_values.get('Инормация для выплат Банк', '')),
+                str(current_values.get('Инормация для выплат Номер телефона СБП', '')),
+                str(current_values.get('Инормация для выплат Имя получателя', '')),
+                str(current_values.get('Статус', ''))
             ]
             
             await asyncio.to_thread(sheet.update, f'A{user_row}:K{user_row}', [row_values])
