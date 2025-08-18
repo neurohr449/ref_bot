@@ -416,7 +416,7 @@ async def write_to_google_sheet(
                 current_values.get('Имя', ''),
                 current_values.get('Фамилия', ''),
                 current_values.get('Номер телефона', ''),
-                current_values.get('Инормация для выплат Номер карты', ''),
+                str(current_values.get('Инормация для выплат Номер карты', '')),
                 current_values.get('Инормация для выплат Банк', ''),
                 current_values.get('Инормация для выплат Номер телефона СБП', ''),
                 current_values.get('Инормация для выплат Имя получателя', ''),

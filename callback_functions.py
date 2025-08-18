@@ -738,17 +738,17 @@ async def bank_info_1_message(message: Message, state: FSMContext):
     
     user_id = message.from_user.id
     user_data = await state.get_data()
-    card_number = user_data.get('bank_card', "❌ не указан")
-    bank_name = user_data.get('bank_bank', "❌ не указан")
-    bank_sbp = user_data.get('bank_sbp', "❌ не указан")
-    bank_fio = user_data.get('bank_fio', "❌ не указан")
+    card_number = user_data.get('bank_card')
+    bank_name = user_data.get('bank_bank')
+    bank_sbp = user_data.get('bank_sbp')
+    bank_fio = user_data.get('bank_fio')
     if card_number is None:
         await load_user_data_to_state(user_id, state)
         user_data = await state.get_data()
-        card_number = user_data.get('bank_card', "❌ не указан")
-        bank_name = user_data.get('bank_bank', "❌ не указан")
-        bank_sbp = user_data.get('bank_sbp', "❌ не указан")
-        bank_fio = user_data.get('bank_fio', "❌ не указан")
+        card_number = user_data.get('bank_card')
+        bank_name = user_data.get('bank_bank')
+        bank_sbp = user_data.get('bank_sbp')
+        bank_fio = user_data.get('bank_fio')
         sheet_id = user_data.get('sheet_id')
         await get_table_data(sheet_id, 0, state)
     if card_number != None:
@@ -979,7 +979,7 @@ async def add_partner_3(message: Message, state: FSMContext):
             [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])
         await message.answer(text = text)
-        await message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_3", reply_markup=keyboard)
+        await message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_2", reply_markup=keyboard)
     else:
         await message.answer("Введите телефон в формате +7xxxxxxxxxx")
 
