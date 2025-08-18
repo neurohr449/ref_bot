@@ -550,14 +550,12 @@ async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_phone = user_data.get('phone')
-    update_status = await write_to_google_sheet(sheet_id=sheet_id,
-                                    user_id=callback_query.from_user.id,
-                                    username=callback_query.from_user.username,
-                                    user_phone=user_phone,
-                                    status = "Закончил обучение"
-                                    )
-    print(update_status)
-    user_phone = user_data.get('phone')
+    await write_to_google_sheet(sheet_id=sheet_id,
+                                user_id=callback_query.from_user.id,
+                                username=callback_query.from_user.username,
+                                user_phone=user_phone,
+                                status = "Закончил обучение"
+                                )
     first_name=user_data.get('user_name')
     last_name=user_data.get('user_last_name')
     chat_id = user_data.get('notification_chat')
@@ -1300,4 +1298,9 @@ async def menu_course_10(callback_query: CallbackQuery, state: FSMContext):
         await menu_end_course_handler(callback_query, state)
 
 async def menu_end_course_handler(callback_query: CallbackQuery, state: FSMContext):
-    await menu(callback_query, state)
+    user_data = await state.get_data()
+    func_id = user_data.get('func_id')
+    if func_id == "3":
+        await callback_query.message.answer("Сообщение для лида")
+    else:
+        await menu(callback_query, state)
