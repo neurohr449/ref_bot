@@ -582,7 +582,9 @@ async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
         last_name=user_data.get('user_last_name')
         chat_id = user_data.get('notification_chat')
         chat_text = f"Партнер прошел обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
-        
+        await chat_notification(chat_id, chat_text)
+        await state.set_state(UserState.menu)
+        await menu(callback_query, state)
     elif func_id == "4":
         await write_to_manager_google_sheet(sheet_id=sheet_id,
                                     user_id=callback_query.from_user.id,
@@ -594,10 +596,11 @@ async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
         last_name=user_data.get('user_last_name')
         chat_id = user_data.get('notification_chat')
         chat_text = f"Менеджер прошел обучение\n\nИмя: {first_name}\nФамилия: {last_name}\nНомер телефона: {user_phone}"
-    await chat_notification(chat_id, chat_text)
-    if func_id != "3":
+        await chat_notification(chat_id, chat_text)
         await state.set_state(UserState.menu)
         await menu(callback_query, state)
+    
+        
     else:
         await callback_query.message.answer("Сообщение для лида")
 

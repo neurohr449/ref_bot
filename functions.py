@@ -184,9 +184,13 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
 
 
 #
-async def check_user_reg(sheet_id, user_id, phone_number):
-    sheet = await get_google_sheet_ro(sheet_id, 2)
-    data = await asyncio.to_thread(sheet.get_all_records)
+async def check_user_reg(sheet_id, user_id, phone_number, func_id):
+    if func_id == "2":
+        sheet = await get_google_sheet_ro(sheet_id, 2)
+        data = await asyncio.to_thread(sheet.get_all_records)
+    if func_id == "4":
+        sheet = await get_google_sheet_ro(sheet_id, 1)
+        data = await asyncio.to_thread(sheet.get_all_records)
     
     if not data or not isinstance(data, list):
         return False
