@@ -128,7 +128,7 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
     await state.update_data(tg_id = user_id)
     await get_table_data(sheet_id, 0, state)
     user_id = str(callback_query.from_user.id)
-        
+    username=callback_query.from_user.username    
         
     if user_id in status_tasks:
         status_tasks[user_id].cancel()
@@ -136,8 +136,8 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
         last_status="Отправка номера телефона",
         last_status_change_time=datetime.now().timestamp()
     )
-    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id))
-    
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
+
     func_id = user_data.get('func_id')
 
 

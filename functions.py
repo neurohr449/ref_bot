@@ -599,11 +599,11 @@ async def write_to_contact_google_sheet(
         return False
 
 
-async def change_status(state: FSMContext, user_id) -> str | None:
+async def change_status(state: FSMContext, user_id, username) -> str | None:
     user_data = await state.get_data()
     last_status = user_data.get('last_status')
 
-    await asyncio.sleep(5)
+    await asyncio.sleep(15)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     func_id = user_data.get('func_id')
@@ -623,6 +623,7 @@ async def change_status(state: FSMContext, user_id) -> str | None:
             if func_id == "2":
                 await write_to_google_sheet(sheet_id=sheet_id,
                                             user_id=user_id,
+                                            username = username,
                                             status=current_status
                                             )
             elif func_id == "3":
@@ -630,6 +631,7 @@ async def change_status(state: FSMContext, user_id) -> str | None:
             elif func_id == "4":
                 await write_to_manager_google_sheet(sheet_id=sheet_id,
                                                     user_id=user_id,
+                                                    username = username,
                                                     status=current_status
                                                     )
                     
