@@ -192,7 +192,8 @@ async def get_table_data(sheet_id, worksheet, state: FSMContext):
         survey_target4=row_data[60],
         timer5=row_data[61],
         survey5=row_data[62],
-        survey_target5=row_data[63]
+        survey_target5=row_data[63],
+        lead_message=row_data[64]
         )
 
         

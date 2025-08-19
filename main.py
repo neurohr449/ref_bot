@@ -42,7 +42,13 @@ class StateMiddleware(BaseMiddleware):
     
 @router.callback_query(lambda c: c.data == 'menu')
 async def menu_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
-    await menu(callback_query, state)
+    user_data = await state.get_data()
+    func_id = user_data.get('func_id')
+    if func_id == "3":
+        text = user_data.get("lead_message")
+        await callback_query.message.answer(text=text)
+    else:
+        await menu(callback_query, state)
 
 @router.message(Command("menu"))
 async def command_menu(message: Message, state: FSMContext):
@@ -384,7 +390,7 @@ async def check_survey_completion(chat_id: int, state: FSMContext, i):
     data = await state.get_data()
     timer = int(data.get(f"timer{i}")) * 60
     await asyncio.sleep(timer)  
-    
+    data = await state.get_data()
     
     if not data.get("survey_completed", False):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -397,7 +403,7 @@ async def check_survey_completion_2(chat_id: int, state: FSMContext, i):
     data = await state.get_data()
     timer = int(data.get(f"timer{i}")) * 60
     await asyncio.sleep(timer)  
-    
+    data = await state.get_data()
     
     if not data.get("survey_completed_2", False):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[

@@ -759,7 +759,9 @@ async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
     
         
     else:
-        await callback_query.message.answer("Сообщение для лида")
+        text = user_data.get("lead_message")
+        await callback_query.message.answer(text=text)
+        
 
 ###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###Course###
 
@@ -1509,6 +1511,7 @@ async def menu_end_course_handler(callback_query: CallbackQuery, state: FSMConte
     user_data = await state.get_data()
     func_id = user_data.get('func_id')
     if func_id == "3":
-        await callback_query.message.answer("Сообщение для лида")
+        text = user_data.get("lead_message")
+        await callback_query.message.answer(text=text)
     else:
         await menu(callback_query, state)
