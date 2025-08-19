@@ -639,4 +639,4 @@ async def change_status(state: FSMContext, user_id) -> str | None:
 
 
 
-asyncio.create_task(change_status(state, user_id))
+# asyncio.create_task(change_status(state, user_id))
