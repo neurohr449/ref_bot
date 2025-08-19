@@ -619,7 +619,7 @@ async def change_status(state: FSMContext, user_id) -> str | None:
             return
 
     current_time = datetime.now()
-    if last_status_change is None or (current_time - datetime.fromtimestamp(last_status_change) >= timedelta(minutes=5)):
+    if last_status_change is None or (current_time - datetime.fromtimestamp(last_status_change) >= timedelta(seconds=4)):
 
             if func_id == "2":
                 await write_to_google_sheet(sheet_id=sheet_id,
