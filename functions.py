@@ -603,7 +603,7 @@ async def change_status(state: FSMContext, user_id, username) -> str | None:
     user_data = await state.get_data()
     last_status = user_data.get('last_status')
 
-    await asyncio.sleep(15)
+    await asyncio.sleep(300)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     func_id = user_data.get('func_id')
@@ -618,7 +618,7 @@ async def change_status(state: FSMContext, user_id, username) -> str | None:
             return
 
     current_time = datetime.now()
-    if last_status_change is None or (current_time - datetime.fromtimestamp(last_status_change) >= timedelta(seconds=4)):
+    if last_status_change is None or (current_time - datetime.fromtimestamp(last_status_change) >= timedelta(minutes=5)):
 
             if func_id == "2":
                 await write_to_google_sheet(sheet_id=sheet_id,

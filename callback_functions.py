@@ -127,7 +127,7 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
     user_id=callback_query.from_user.id
     await state.update_data(tg_id = user_id)
     await get_table_data(sheet_id, 0, state)
-    user_id = str(callback_query.from_user.id)
+    user_id = callback_query.from_user.id
     username=callback_query.from_user.username    
         
     if user_id in status_tasks:
@@ -184,6 +184,15 @@ async def reg_2(message: Message, state: FSMContext):
     if match:
         
         if phone_number:
+            username=message.from_user.username    
+        
+            if user_id in status_tasks:
+                status_tasks[user_id].cancel()
+            await state.update_data(
+                last_status="Отправка имени",
+                last_status_change_time=datetime.now().timestamp()
+            )
+            status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
             user_reg_status = await check_user_reg(sheet_id, user_id, phone_number, func_id)
             if user_reg_status == False:
                 await state.update_data(phone=phone_number)
@@ -203,6 +212,16 @@ async def reg_3(message: Message, state: FSMContext):
     user_data = await state.get_data()
     user_name = message.text
     await state.update_data(user_name=user_name)
+    user_id = message.from_user.id
+    username=message.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Отправка фамилии",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('reg_3')
     if text:
         await message.answer(text=text)
@@ -214,6 +233,16 @@ async def reg_4(message: Message, state: FSMContext):
     user_last_name = message.text
     user_name = user_data.get('user_name')
     phone = user_data.get('phone')
+    user_id = message.from_user.id
+    username=message.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Подтверждение данных",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     await state.update_data(user_last_name=user_last_name)
     text = f"🔎 Пожалуйста, проверьте введённые данные:      \n\n— Имя: {user_name}     \n— Фамилия: {user_last_name}     \n— Телефон: {phone}  \n\n------ \nЕсли всё верно, нажмите кнопку «Далее» для перехода к следующему шагу.  Если нужно что-то изменить, нажмите «Изменить»— вы сможете внести корректировки.\n\n Нажимая далее вы даете согласие на обработку персональных данных. \n\n Нажимая далее вы соглашаетесь с условиями оферты"
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -232,6 +261,16 @@ async def reg_4_1(callback_query: CallbackQuery, state: FSMContext):
     user_last_name = user_data.get('user_last_name')
     user_name = user_data.get('user_name')
     phone = user_data.get('phone')
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Подтверждение данных",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = f"🔎 Пожалуйста, проверьте введённые данные:      \n\n— Имя: {user_name}     \n— Фамилия: {user_last_name}     \n— Телефон: {phone}  \n\n------ \nЕсли всё верно, нажмите кнопку «Далее» для перехода к следующему шагу.  Если нужно что-то изменить, нажмите «Изменить»— вы сможете внести корректировки.\n\n Нажимая далее вы даете согласие на обработку персональных данных. \n\n Нажимая далее вы соглашаетесь с условиями оферты"
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Далее", callback_data="next"),
@@ -257,6 +296,16 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
         ref_id = user_data.get('ref_id')
         ref_cash = user_data.get("cash_amount")
         func_id = user_data.get('func_id')
+        user_id = callback_query.from_user.id
+        username=callback_query.from_user.username    
+            
+        if user_id in status_tasks:
+            status_tasks[user_id].cancel()
+        await state.update_data(
+            last_status="Обучение 1",
+            last_status_change_time=datetime.now().timestamp()
+        )
+        status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
         # if ref_id == "1" or func_id == "4":
         if func_id == "2":
             if not user_phone.startswith("+"):
@@ -375,6 +424,16 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_2(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 2",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_2')
     video = user_data.get('video_2')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -398,6 +457,16 @@ async def course_2(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_3(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 3",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_3')
     video = user_data.get('video_3')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -421,6 +490,16 @@ async def course_3(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_4(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 4",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_4')
     video = user_data.get('video_4')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -444,6 +523,16 @@ async def course_4(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_5(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 5",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_5')
     video = user_data.get('video_5')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -467,6 +556,16 @@ async def course_5(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_6(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 6",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_6')
     video = user_data.get('video_6')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -490,6 +589,16 @@ async def course_6(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_7(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 7",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_7')
     video = user_data.get('video_7')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -513,6 +622,16 @@ async def course_7(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_8(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 8",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_8')
     video = user_data.get('video_8')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -537,6 +656,16 @@ async def course_8(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_9(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 9",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_9')
     video = user_data.get('video_9')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -561,6 +690,16 @@ async def course_9(callback_query: CallbackQuery, state: FSMContext):
 
 async def course_10(callback_query: CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    user_id = callback_query.from_user.id
+    username=callback_query.from_user.username    
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Обучение 10",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id,username))
     text = user_data.get('text_10')
     video = user_data.get('video_10')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
