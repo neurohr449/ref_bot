@@ -5,7 +5,7 @@ from google.oauth2.service_account import Credentials
 from aiogram.fsm.context import FSMContext
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 
@@ -599,3 +599,44 @@ async def write_to_contact_google_sheet(
         return False
 
 
+async def change_status(state: FSMContext, user_id) -> str | None:
+    user_data = await state.get_data()
+    last_status = user_data.get('last_status')
+
+    await asyncio.sleep(5)
+    user_data = await state.get_data()
+    sheet_id = user_data.get('sheet_id')
+    func_id = user_data.get('func_id')
+    user_phone = user_data.get('phone')
+    current_status  = user_data.get('last_status')
+    last_status_change = user_data.get('last_status_change_time')
+    current_time = datetime.now()
+
+    if current_status != last_status:
+            return
+    
+    if current_status  != "Закончил обучение":
+            return
+
+    current_time = datetime.now()
+    if last_status_change is None or (current_time - datetime.fromtimestamp(last_status_change) >= timedelta(minutes=5)):
+
+            if func_id == "2":
+                await write_to_google_sheet(sheet_id=sheet_id,
+                                            user_id=user_id,
+                                            user_phone=user_phone,
+                                            status=current_status
+                                            )
+            elif func_id == "3":
+                return
+            elif func_id == "4":
+                await write_to_manager_google_sheet(sheet_id=sheet_id,
+                                                    user_id=user_id,
+                                                    user_phone=user_phone,
+                                                    status=current_status
+                                                    )
+                    
+
+
+
+asyncio.create_task(change_status(state, user_id))

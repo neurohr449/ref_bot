@@ -28,6 +28,8 @@ FAIL_KEYBOARD = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Попробовать снова", callback_data="retry")]
             ])
 TELEGRAM_VIDEO_PATTERN = r'https://t\.me/'
+status_tasks = {}
+
 
 async def chat_notification(chat_id, text):
     await bot.send_message(chat_id=chat_id,
@@ -125,8 +127,16 @@ async def reg_1(callback_query: CallbackQuery, state: FSMContext):
     user_id=callback_query.from_user.id
     await state.update_data(tg_id = user_id)
     await get_table_data(sheet_id, 0, state)
-   
-    
+    user_id = str(callback_query.from_user.id)
+        
+        
+    if user_id in status_tasks:
+        status_tasks[user_id].cancel()
+    await state.update_data(
+        last_status="Отправка номера телефона",
+        last_status_change_time=datetime.now().timestamp()
+    )
+    status_tasks[user_id] = asyncio.create_task(change_status(state, user_id))
     
     func_id = user_data.get('func_id')
 
@@ -573,10 +583,12 @@ async def course_10(callback_query: CallbackQuery, state: FSMContext):
         await end_course_handler(callback_query, state)
 
 async def end_course_handler(callback_query: CallbackQuery, state: FSMContext):
+    await state.update_data(survey_completed_2=True)
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     user_phone = user_data.get('phone')
     func_id = user_data.get('func_id')
+    await state.update_data(last_status = "Закончил обучение")
     if func_id == "2":
         await write_to_google_sheet(sheet_id=sheet_id,
                                     user_id=callback_query.from_user.id,

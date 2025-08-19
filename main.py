@@ -120,12 +120,12 @@ async def reg_4_1_handler(callback_query: CallbackQuery, state: FSMContext) -> N
 async def course_1_cb_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await state.update_data(
         survey_started=datetime.now(),
-        survey_completed=False
+        survey_completed_2=False
     )
     user_data = await state.get_data()
     for i in range(1, 6):
         if user_data.get(f"survey{i}") and user_data.get(f"survey_target{i}") == "Этап обучения":
-            asyncio.create_task(check_survey_completion(callback_query.message.chat.id, state, i))
+            asyncio.create_task(check_survey_completion_2(callback_query.message.chat.id, state, i))
     await course_1(callback_query, state)
 
 @router.callback_query(StateFilter(UserState.course_1))
@@ -391,6 +391,20 @@ async def check_survey_completion(chat_id: int, state: FSMContext, i):
         [InlineKeyboardButton(text="Продолжить", callback_data="notification")]
         ])
         await bot.send_message(chat_id, f"{data.get(f'survey{i}')}",reply_markup=keyboard)
+
+
+async def check_survey_completion_2(chat_id: int, state: FSMContext, i):
+    data = await state.get_data()
+    timer = int(data.get(f"timer{i}")) * 60
+    await asyncio.sleep(timer)  
+    
+    
+    if not data.get("survey_completed_2", False):
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Продолжить", callback_data="notification")]
+        ])
+        await bot.send_message(chat_id, f"{data.get(f'survey{i}')}",reply_markup=keyboard)
+
 
 
 @router.callback_query(lambda c: c.data == 'notification')
