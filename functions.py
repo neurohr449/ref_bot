@@ -607,7 +607,6 @@ async def change_status(state: FSMContext, user_id) -> str | None:
     user_data = await state.get_data()
     sheet_id = user_data.get('sheet_id')
     func_id = user_data.get('func_id')
-    user_phone = user_data.get('phone')
     current_status  = user_data.get('last_status')
     last_status_change = user_data.get('last_status_change_time')
     current_time = datetime.now()
@@ -615,7 +614,7 @@ async def change_status(state: FSMContext, user_id) -> str | None:
     if current_status != last_status:
             return
     
-    if current_status  != "Закончил обучение":
+    if current_status  == "Закончил обучение":
             return
 
     current_time = datetime.now()
@@ -624,7 +623,6 @@ async def change_status(state: FSMContext, user_id) -> str | None:
             if func_id == "2":
                 await write_to_google_sheet(sheet_id=sheet_id,
                                             user_id=user_id,
-                                            user_phone=user_phone,
                                             status=current_status
                                             )
             elif func_id == "3":
@@ -632,7 +630,6 @@ async def change_status(state: FSMContext, user_id) -> str | None:
             elif func_id == "4":
                 await write_to_manager_google_sheet(sheet_id=sheet_id,
                                                     user_id=user_id,
-                                                    user_phone=user_phone,
                                                     status=current_status
                                                     )
                     
