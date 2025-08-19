@@ -894,7 +894,7 @@ async def ref_link_1(callback_query: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="Главное меню", callback_data="menu")]
             ])
     await callback_query.message.edit_text(text = text)
-    await callback_query.message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_3", reply_markup = keyboard)
+    await callback_query.message.answer(text = f"{text_2} https://t.me/referal_programs_bot?start={sheet_id}_{user_id}_3", reply_markup = keyboard)
 
 async def bank_info_1(callback_query: CallbackQuery, state: FSMContext):
     await state.set_state(UserState.bank_info_change)
@@ -1189,7 +1189,7 @@ async def add_partner_3(message: Message, state: FSMContext):
             [InlineKeyboardButton(text="🏠 Главное меню", callback_data="menu")]
             ])
         await message.answer(text = text)
-        await message.answer(text = f"{text_2} https://t.me/teferal_test_bot?start={sheet_id}_{user_id}_2", reply_markup=keyboard)
+        await message.answer(text = f"{text_2} https://t.me/referal_programs_bot?start={sheet_id}_{user_id}_2", reply_markup=keyboard)
     else:
         await message.answer("Введите телефон в формате +7xxxxxxxxxx")
 
