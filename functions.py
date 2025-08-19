@@ -120,7 +120,7 @@ async def get_google_sheet_notification(sheet_id: str, list_index: int):
 async def get_range_data(sheet_id, worksheet, state: FSMContext):
     user_data = await state.get_data()
     range_num = user_data.get('func_id')
-    range_name = f"B{range_num}:B{range_num}"
+    range_name = f"C{range_num}:C{range_num}"
     value = await get_google_sheet_data(sheet_id, range_name, worksheet)
     row_data = value[0]
     return row_data[0]
