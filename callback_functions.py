@@ -311,10 +311,12 @@ async def course_1(callback_query: CallbackQuery, state: FSMContext):
             if not user_phone.startswith("+"):
                 user_phone = f"+{user_phone.lstrip('+')}"
                 
-            
+            username = await get_username_by_id(bot, ref_id)
+
             update_status = await write_to_google_sheet(sheet_id=sheet_id,
                                     user_id=callback_query.from_user.id,
                                     username=callback_query.from_user.username,
+                                    manager_id=ref_id,
                                     first_name=first_name,
                                     last_name=last_name,
                                     user_phone=user_phone,
