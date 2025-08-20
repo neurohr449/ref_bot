@@ -396,7 +396,7 @@ async def write_to_google_sheet(
                 str(current_values.get('Статус', ''))
             ]
             
-            await asyncio.to_thread(sheet.update, f'A{user_row}:K{user_row}', [row_values])
+            await asyncio.to_thread(sheet.update, f'A{user_row}:L{user_row}', [row_values])
         else:
             new_row = [
                 user_id,
